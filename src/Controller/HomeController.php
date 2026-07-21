@@ -104,23 +104,18 @@ final class HomeController extends AbstractController
             // working directory, it's necessary for command
             $workDir = $this->getParameter('kernel.project_dir');
 
-
             $command = sprintf(
-                'php bin/console app:import-document %s --type=%s > var/log/import.log 2>&1 &', 
+                'command php bin/console app:import-document %s --type=%s > var/log/import.log 2>&1', 
                 $fileId, 
                 $fileType);
-
-            dd($command);
 
             $process = Process::fromShellCommandline($command);
 
             $process->setWorkingDirectory($workDir);
 
-            $process->run();
+            $process->start();
 
-
-            $output = $process->getOutput();
-            dd("HERE");
+            
             $userCount = $this->importerService->getSavedUserCount();
 
             if (0 !== $userCount) {
@@ -137,31 +132,6 @@ final class HomeController extends AbstractController
 
     }
 
-    // testing route for testing new functions
-    // #[Route('/test', name: 'app_test')]
-    // public function test()
-    // {
-    //     $file = $this->getParameter('kernel.project_dir') . '/var/uploads/test.csv';
-    //     $test2 = [];
-
-    //     $stream = fopen($file, 'r');
-
-    //     while (($row = fgetcsv($stream, separator: ';')) !== false) {
-    //         dump($row);
-    //     }
-    //     // foreach ($row = fgetcsv($stream, separator: ';') as $data) {
-    //     //     dump($row);
-    //     // }
-
-    //     // VON CHATGPT:
-    //     // while (($row = fgetcsv($stream, separator: ";")) !== false) {
-    //     //     print_r($row);
-    //     // }
-
-    //     // $test = fgetcsv($stream, separator: ';');
-
-    //     dd($test2);
-    // }
 
     public function normalizeType(UploadedFile $file): string
     {
