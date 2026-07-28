@@ -11,14 +11,19 @@ use App\Service\ImporterService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Console\Messenger\RunCommandMessage;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Contracts\Service\Attribute\Required;
 
 final class HomeController extends AbstractController
 {
+    private MessageBusInterface $bus;
+
     public function __construct(
         protected EntityManagerInterface $em,
         protected ImporterService $importerService,
@@ -26,6 +31,12 @@ final class HomeController extends AbstractController
         protected ImportFileHandler $importFileHandler
     )
     {
+    }
+
+    #[Required]
+    public function setMessageBus(MessageBusInterface $bus): void
+    {
+        $this->bus = $bus;
     }
 
     #[Route('/', name: 'app_home')]
@@ -48,20 +59,6 @@ final class HomeController extends AbstractController
                 $type = $this->normalizeType($file);
 
                 $this->importFileHandler->handleUploadedFile($fileImport, $name, $type);
-                
-                // $fileType = $tw
-
-                // $fileName = $file->getClientOriginalName();
-
-                // $this->importerService->execute($fileImport, $fileName, $fileType);
-
-                // $userCount = $this->importerService->getSavedUserCount();
-
-                // if (0 !== $userCount) {
-                //     $this->addFlash('success', "Import successful, {$userCount} users saved to the database.");
-                // } else {
-                //     $this->addFlash('danger', 'Something went wrong during the import. No users saved to the database.');
-                // }
 
                 $this->addFlash('success', 'File upload complete');
 
@@ -80,18 +77,8 @@ final class HomeController extends AbstractController
     }
 
     #[Route('/import/{fileId}', name: 'app_import')]
-    public function startImport(Request $request, int $fileId): void
+    public function startImport(Request $request, int $fileId): Response
     {
-        /**
-         * Eine sicherere Variante, um den Command zu erstellen wäre direkt in einem array mit separaten Werte:
-         * $process = new Process([
-         *  'php',
-         *  'bin/console',
-         *  'app:import-file',
-         *  (string) $fileId,
-         * ]);
-         */
-
         $file = $this->fileImportRepository->find($fileId);
         $fileType = FileTypeEnum::extension($file->fileType);
 
@@ -100,31 +87,16 @@ final class HomeController extends AbstractController
         }
 
         try {
-
-            // working directory, it's necessary for command
-            $workDir = $this->getParameter('kernel.project_dir');
-
-            $command = sprintf(
-                'command php bin/console app:import-document %s --type=%s > var/log/import.log 2>&1', 
-                $fileId, 
-                $fileType);
-
-            $process = Process::fromShellCommandline($command);
-
-            $process->setWorkingDirectory($workDir);
-
-            $process->start();
-
+            $this->bus->dispatch(new RunCommandMessage(
+                sprintf(
+                    'app:import-document %s --type=%s', 
+                    $fileId, 
+                    $fileType)
+            ));
             
-            $userCount = $this->importerService->getSavedUserCount();
+            $this->addFlash('success', "Import started.");
 
-            if (0 !== $userCount) {
-                $this->addFlash('success', "Import successful, {$userCount} users saved to the database.");
-            } else {
-                $this->addFlash('danger', 'Something went wrong during the import. No users saved to the database.');
-            }
-
-            $this->redirectToRoute('app_home');
+            return $this->redirectToRoute('app_home');
 
         } catch (Exception $e) {
             throw new \RuntimeException("Error during import process: {$e->getMessage()}");
