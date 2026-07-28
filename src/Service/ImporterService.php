@@ -9,6 +9,7 @@ use App\Importer\Strategy\ImporterInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use RuntimeException;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
+use Symfony\Component\HttpKernel\Profiler\Profiler;
 use Symfony\Contracts\Service\Attribute\Required;
 
 final class ImporterService
@@ -36,8 +37,10 @@ final class ImporterService
         $this->importFileHandler = $importFileHandler;
     }
 
-    public function execute(FileImport $file, string $fileType): void
+    public function execute(FileImport $file, string $fileType, ?Profiler $profiler): void
     {
+        $profiler?->disable();
+
         foreach ($this->importers as $importer) {
             if ($importer->supports($fileType)) {
                 

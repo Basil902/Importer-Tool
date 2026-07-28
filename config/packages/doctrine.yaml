@@ -21,6 +21,14 @@ doctrine:
                 prefix: 'App\Entity'
                 alias: App
 
+when@dev:
+    doctrine:
+        dbal:
+            # Stop Doctrine from collecting every executed query in memory for the profiler, avoids
+            # 'out of memory' error while the import is running.
+            profiling: false
+            profiling_collect_backtrace: false
+
 when@test:
     doctrine:
         dbal:
