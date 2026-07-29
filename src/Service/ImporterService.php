@@ -17,7 +17,7 @@ final class ImporterService
     protected array $importers = [];
     protected ImporterInterface $activeImporter;
     private ImportFileHandler $importFileHandler;
-    private ?Profiler $profiler;
+    private ?Profiler $profiler = null;
 
     public function __construct(
         protected EntityManagerInterface $em,
@@ -73,6 +73,8 @@ final class ImporterService
 
     private function disableProfiler(): void
     {
-        $this->profiler?->disable();
+        if (null != $this->profiler) {
+            $this->profiler->disable();
+        }
     }
 }
