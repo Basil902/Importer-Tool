@@ -3,8 +3,8 @@
 namespace App\Entity;
 
 use App\Enum\FileTypeEnum;
+use App\Enum\ImportStatusEnum;
 use App\Repository\FileImportRepository;
-use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\HttpFoundation\File\File;
 use Vich\UploaderBundle\Mapping\Attribute as Vich;
@@ -33,9 +33,8 @@ class FileImport
     #[ORM\Column]
     public \DateTimeImmutable $updatedAt;
 
-    #[ORM\Column(length: 255)]
-    #[Assert\Choice(choices: ['PENDING', 'SUCCESS', 'ERROR'])]
-    public string $status;
+    #[ORM\Column(length: 255, enumType: ImportStatusEnum::class)]
+    public ImportStatusEnum $status;
 
     public function setFile(?File $file = null): void
     {

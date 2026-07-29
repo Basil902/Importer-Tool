@@ -4,14 +4,13 @@ namespace App\Handler;
 
 use App\Entity\FileImport;
 use App\Enum\FileTypeEnum;
+use App\Enum\ImportStatusEnum;
 use Doctrine\ORM\EntityManagerInterface;
 
-final class ImportFileHandler
-{
-    public const STATUS_PENDING = 'pending';
-    public const STATUS_PROCESSED = 'processed';
-    public const STATUS_ERROR = 'error';
+# Note: This is simply a class for handling uploaded import files. It has nothing to do with symfony messenger or messages in general.
 
+final class ImportFileUploadHandler
+{
     public function __construct(
         protected EntityManagerInterface $em
     )
@@ -24,7 +23,7 @@ final class ImportFileHandler
 
         $file->fileName = $name;
         $file->fileType = $normalizedType;
-        $file->status = self::STATUS_PENDING;
+        $file->status = ImportStatusEnum::STATUS_PENDING;
 
         $this->em->persist($file);
         $this->em->flush();

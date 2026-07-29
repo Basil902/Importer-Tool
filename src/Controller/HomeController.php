@@ -5,18 +5,17 @@ namespace App\Controller;
 use App\Entity\FileImport;
 use App\Enum\FileTypeEnum;
 use App\Form\UploadFileFormType;
-use App\Handler\ImportFileHandler;
+use App\Handler\ImportFileUploadHandler;
+use App\Message\ImportFileMessage;
 use App\Repository\FileImportRepository;
 use App\Service\ImporterService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Console\Messenger\RunCommandMessage;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Messenger\MessageBusInterface;
-use Symfony\Component\Process\Process;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Service\Attribute\Required;
 
@@ -28,7 +27,7 @@ final class HomeController extends AbstractController
         protected EntityManagerInterface $em,
         protected ImporterService $importerService,
         protected FileImportRepository $fileImportRepository,
-        protected ImportFileHandler $importFileHandler
+        protected ImportFileUploadHandler $importFileUploadHandler
     )
     {
     }
@@ -58,7 +57,7 @@ final class HomeController extends AbstractController
                 $name = $file->getClientOriginalName();
                 $type = $this->normalizeType($file);
 
-                $this->importFileHandler->handleUploadedFile($fileImport, $name, $type);
+                $this->importFileUploadHandler->handleUploadedFile($fileImport, $name, $type);
 
                 $this->addFlash('success', 'File upload complete');
 
@@ -86,14 +85,9 @@ final class HomeController extends AbstractController
             throw new \RuntimeException("No file found for file id: {$fileId}");
         }
 
-        try {
-            $this->bus->dispatch(new RunCommandMessage(
-                sprintf(
-                    'app:import-document %s --type=%s', 
-                    $fileId, 
-                    $fileType)
-            ));
-            
+        try {        
+            $this->bus->dispatch(new ImportFileMessage($fileId, $fileType));            
+
             $this->addFlash('success', "Import started.");
 
             return $this->redirectToRoute('app_home');

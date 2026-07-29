@@ -3,7 +3,7 @@
 namespace App\Service;
 
 use App\Entity\FileImport;
-use App\Handler\ImportFileHandler;
+use App\Enum\ImportStatusEnum;
 use App\Handler\ImportUserHandler;
 use App\Importer\Strategy\ImporterInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -16,7 +16,6 @@ final class ImporterService
 {
     protected array $importers = [];
     protected ImporterInterface $activeImporter;
-    private ImportFileHandler $importFileHandler;
     private ?Profiler $profiler = null;
 
     public function __construct(
@@ -33,18 +32,12 @@ final class ImporterService
     }
 
     #[Required]
-    public function setImportFileHandler(ImportFileHandler $importFileHandler): void
-    {
-        $this->importFileHandler = $importFileHandler;
-    }
-
-    #[Required]
     public function setProfiler(?Profiler $profiler): void
     {
         $this->$profiler = $profiler;
     }
 
-    public function execute(FileImport $file, string $fileType): void
+    public function execute(FileImport $file, string $fileType, int $fileImportId): void
     {
         $this->disableProfiler();
 
@@ -54,7 +47,7 @@ final class ImporterService
                 $this->activeImporter = $importer;
                 $importer->import($file);
                 $this->batchService->finalize();
-                $this->importFileHandler::STATUS_PROCESSED; 
+                $this->updateFileImportStatus($fileImportId);
                 return;
             }
         }
@@ -69,6 +62,19 @@ final class ImporterService
         }
 
         throw new \RuntimeException('Exception while trying to return saved user count: no active importer set');
+    }
+
+    public function updateFileImportStatus(int $importId): void
+    {
+        $fileImport = $this->em->getRepository(FileImport::class)->find($importId);
+
+        if (!$fileImport) {
+            throw new \RuntimeException("No file import found with ID {$importId}.");
+        }
+
+        $fileImport->status = ImportStatusEnum::STATUS_PROCESSED;
+        
+        $this->em->flush();
     }
 
     private function disableProfiler(): void
