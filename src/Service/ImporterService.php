@@ -17,6 +17,7 @@ final class ImporterService
     protected array $importers = [];
     protected ImporterInterface $activeImporter;
     private ImportFileHandler $importFileHandler;
+    private ?Profiler $profiler;
 
     public function __construct(
         protected EntityManagerInterface $em,
@@ -37,9 +38,15 @@ final class ImporterService
         $this->importFileHandler = $importFileHandler;
     }
 
-    public function execute(FileImport $file, string $fileType, ?Profiler $profiler): void
+    #[Required]
+    public function setProfiler(?Profiler $profiler): void
     {
-        $profiler?->disable();
+        $this->$profiler = $profiler;
+    }
+
+    public function execute(FileImport $file, string $fileType): void
+    {
+        $this->disableProfiler();
 
         foreach ($this->importers as $importer) {
             if ($importer->supports($fileType)) {
@@ -62,5 +69,10 @@ final class ImporterService
         }
 
         throw new \RuntimeException('Exception while trying to return saved user count: no active importer set');
+    }
+
+    private function disableProfiler(): void
+    {
+        $this->profiler?->disable();
     }
 }
