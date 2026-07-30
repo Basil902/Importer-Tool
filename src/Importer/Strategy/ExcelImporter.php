@@ -38,25 +38,6 @@ final class ExcelImporter extends AbstractImporter
                 $this->extractData($dataRow);
             }
         }
-        // $reader->setReadDataOnly(true);
-        // $spreadSheet = $reader->load($file);
-        // $sheet = $spreadSheet->getActiveSheet();
-
-        // foreach ($sheet->getRowIterator() as $index => $row) {
-        //     $dataRow = [];
-
-        //     // getRowIterator() is 1-based and thus starts at 1 instead of the conventional 0 in standard php arrays
-        //     // skip the first row which are just the headers / columns
-        //     if (1 === $index) {
-        //         continue;
-        //     }
-
-        //     foreach ($row->getCellIterator() as $cell) {
-        //         $dataRow[] = $cell->getValue();
-        //     }
-
-        //     $this->extractData($dataRow);
-        // }
     }
 
     protected function extractData(array $row): void

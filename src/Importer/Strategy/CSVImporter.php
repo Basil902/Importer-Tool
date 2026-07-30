@@ -34,16 +34,10 @@ final class CSVImporter extends AbstractImporter
         }
 
         fclose($fileStream);
-        // $content = file_get_contents($file);
-        // $rows = explode("\r\n", $content);
-
-        // $this->extractData($rows);
     }
 
     protected function extractData(array $row): void
     {
-        // foreach (array_slice($rows, 1) as $row) {
-
         try {
             $userDTO = $this->userDTO::create();
 
@@ -60,8 +54,5 @@ final class CSVImporter extends AbstractImporter
         } catch (Exception $e) {
             throw new \RuntimeException("An Exception occurred while trying to extract data from import: {$e->getMessage()}");
             }
-            // überlegen ob finalize im importer service aufgerufen wird oder doch hier?
-            // $this->importUserHandler->finalize();
-        // }
     }
 }

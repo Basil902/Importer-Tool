@@ -28,7 +28,6 @@ final class JSONImporter extends AbstractImporter
         $this->extractData($data);
     }
 
-
     protected function extractData(array $data): void
     {
         $this->savedUserCount = 0;
@@ -53,10 +52,6 @@ final class JSONImporter extends AbstractImporter
 
         } catch (Exception $e) {
             throw new \RuntimeException("An Exception occurred while trying to extract data from import: {$e->getMessage()}");
-
         }
-
-        
     }
-
 }
