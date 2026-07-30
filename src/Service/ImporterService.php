@@ -14,7 +14,6 @@ use Symfony\Contracts\Service\Attribute\Required;
 
 final class ImporterService
 {
-    protected array $importers = [];
     protected ImporterInterface $activeImporter;
     private ?Profiler $profiler = null;
 
@@ -23,18 +22,15 @@ final class ImporterService
         protected ImportUserHandler $importUserHandler,
         protected BatchService $batchService,
         #[AutowireIterator('app.importer_strategy')]
-        iterable $importers,
+        private iterable $importers,
     )
     {
-        foreach ($importers as $importer) {
-            $this->importers[] = $importer;
-        }
     }
 
     #[Required]
     public function setProfiler(?Profiler $profiler): void
     {
-        $this->$profiler = $profiler;
+        $this->profiler = $profiler;
     }
 
     public function execute(FileImport $file, string $fileType, int $fileImportId): void
