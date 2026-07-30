@@ -45,9 +45,10 @@ final class ImporterService
             if ($importer->supports($fileType)) {
                 
                 $this->activeImporter = $importer;
+                $this->updateFileImportStatus($fileImportId, ImportStatusEnum::STATUS_PROCESSING);
                 $importer->import($file);
                 $this->batchService->finalize();
-                $this->updateFileImportStatus($fileImportId);
+                $this->updateFileImportStatus($fileImportId, ImportStatusEnum::STATUS_PROCESSED);
                 return;
             }
         }
@@ -64,7 +65,7 @@ final class ImporterService
         throw new \RuntimeException('Exception while trying to return saved user count: no active importer set');
     }
 
-    public function updateFileImportStatus(int $importId): void
+    public function updateFileImportStatus(int $importId, ImportStatusEnum $importStatus): void
     {
         $fileImport = $this->em->getRepository(FileImport::class)->find($importId);
 
@@ -72,7 +73,7 @@ final class ImporterService
             throw new \RuntimeException("No file import found with ID {$importId}.");
         }
 
-        $fileImport->status = ImportStatusEnum::STATUS_PROCESSED;
+        $fileImport->status = $importStatus;
         
         $this->em->flush();
     }
