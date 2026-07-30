@@ -31,18 +31,19 @@
 
             <form action="{{ path('app_import', { 'fileId': file.id }) }}" method="POST">
 
-                <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:10px;">
+                <div style="display:flex;align-items:center;justify-content:center;gap:10px;">
                     {{ file.id }}
                     {{ file.fileName }}
 
-                    {% if 'processed' == file.status.value %}
-                        <p style="color:greenyellow;">
-                            Imported
-                        </p>
-                    {% else %}
+                    {% if 'uploaded' == file.status.value %}
                         <button type="submit">
                             Import
                         </button>
+
+                    {% else %}
+                        <p class={{ "import-" ~ file.status.value }}>
+                            {{ file.status.value }}
+                        </p> 
                     {% endif %}
                 </div>
             </form>

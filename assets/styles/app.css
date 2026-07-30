@@ -1,3 +1,12 @@
 body {
-    background-color: skyblue;
+    color: white;
+    background-color: rgb(58, 61, 62);
+}
+
+.import-processing {
+    color: yellow
+}
+
+.import-processed {
+    color: greenyellow
 }
