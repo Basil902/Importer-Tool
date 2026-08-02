@@ -98,6 +98,20 @@ final class HomeController extends AbstractController
 
     }
 
+    #[Route('/delete-import/{fileId}', name: 'app_delete_file')]
+    public function deleteFile(int $fileId, Request $request): Response
+    {
+        $file = $this->fileImportRepository->find($fileId);
+
+        if (!$this->isCsrfTokenValid("delete-{$fileId}", $request->request->get('_token'))) {
+            throw $this->createAccessDeniedException();
+        }
+
+        $this->importFileUploadHandler->deleteUploadedFile($file);
+        $this->addFlash('success', 'File deleted successfully.');
+
+        return $this->redirectToRoute('app_home');
+    }
 
     public function normalizeType(UploadedFile $file): string
     {
