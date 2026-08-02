@@ -25,7 +25,13 @@ class FileImportNamer implements NamerInterface
         $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
 
         if ('txt' === $extension) {
-            $extension = 'text/csv' === $file->getClientMimeType() ? 'csv' : $extension;
+            $mimeType = $file->getClientMimeType();
+
+            $extension = match ($mimeType) {
+                'text/csv' => 'csv',
+                'application/json' => 'json',
+                default => 'undefined'
+            };
         }
 
         if (!in_array($extension, self::SUPPORTED_EXTENSIONS)) {

@@ -17,7 +17,7 @@ class UploadFileFormType extends AbstractType
             'label' => 'Upload File (CSV, JSON, XML, XLSX)',
             'required' => true,
             'attr' => [
-                'accept' => '.csv,.json,.xml,.xlsx,.xls'
+                'accept' => '.csv,.json,.xml,.xlsx,.xls,.txt'
             ],
         ]);
 

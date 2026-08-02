@@ -5,26 +5,47 @@ namespace App\Service;
 use App\Entity\FileImport;
 use App\Enum\ImportStatusEnum;
 use App\Handler\ImportUserHandler;
-use App\Importer\Strategy\ImporterInterface;
+use App\Import\ImportErrorLogger;
+use App\Import\Reader\Strategy\ReaderInterface;
+use App\Import\UserMapper;
 use Doctrine\ORM\EntityManagerInterface;
-use RuntimeException;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\HttpKernel\Profiler\Profiler;
 use Symfony\Contracts\Service\Attribute\Required;
 
 final class ImporterService
 {
-    protected ImporterInterface $activeImporter;
     private ?Profiler $profiler = null;
+    private ImportFileLocator $importFileLocator;
+    private UserMapper $userMapper;
+    private ImportErrorLogger $ImportErrorLogger;
 
     public function __construct(
         protected EntityManagerInterface $em,
         protected ImportUserHandler $importUserHandler,
         protected BatchService $batchService,
-        #[AutowireIterator('app.importer_strategy')]
-        private iterable $importers,
+        #[AutowireIterator('app.reader_strategy')]
+        private iterable $readers,
     )
     {
+    }
+
+    #[Required]
+    public function setImportFileLocator(ImportFileLocator $importFileLocator): void
+    {
+        $this->importFileLocator = $importFileLocator;
+    }
+
+    #[Required]
+    public function setUserMapper(UserMapper $userMapper): void
+    {
+        $this->userMapper = $userMapper;
+    }
+
+    #[Required]
+    public function setImportErrorLogger(ImportErrorLogger $ImportErrorLogger): void
+    {
+        $this->ImportErrorLogger = $ImportErrorLogger;
     }
 
     #[Required]
@@ -35,30 +56,44 @@ final class ImporterService
 
     public function execute(FileImport $file, string $fileType, int $fileImportId): void
     {
+        $file = $this->importFileLocator->getFileToImport($file);
+        $importReader = $this->readerFor($fileType);
+        # disable profiler to reduce memory usage
         $this->disableProfiler();
+        $this->updateFileImportStatus($fileImportId, ImportStatusEnum::STATUS_PROCESSING);
 
-        foreach ($this->importers as $importer) {
-            if ($importer->supports($fileType)) {
-                
-                $this->activeImporter = $importer;
-                $this->updateFileImportStatus($fileImportId, ImportStatusEnum::STATUS_PROCESSING);
-                $importer->import($file);
-                $this->batchService->finalize();
-                $this->updateFileImportStatus($fileImportId, ImportStatusEnum::STATUS_PROCESSED);
-                return;
+        try {
+            foreach ($importReader->read($file) as $lineNo => $data) {
+                # the inner try/catch is for logging purposes, in case some rows are malformed. It also doesnt stop the import flow.
+                try {
+                    $dto = $this->userMapper->mapDto($data);
+                    $this->importUserHandler->handleUserData($dto);
+                } catch (\Throwable $e) {
+                    $this->ImportErrorLogger->log("Error while processing row $lineNo: {$e->getMessage()}");
+                }     
+            }
+
+            $this->batchService->finalize();
+            $this->updateFileImportStatus($fileImportId, ImportStatusEnum::STATUS_PROCESSED);
+            return;
+
+        } catch (\Throwable $e) {
+            $this->updateFileImportStatus($fileImportId, ImportStatusEnum::STATUS_ERROR);
+            throw $e;
+        }
+         
+        
+    }
+
+    protected function readerFor(string $fileType): ReaderInterface
+    {
+        foreach ($this->readers as $reader) {
+            if ($reader->supports($fileType)) {
+                return $reader;
             }
         }
 
-        throw new RuntimeException("No importer found for type '{$fileType}'.");
-    }
-
-    public function getSavedUserCount(): int
-    {
-        if ($this->activeImporter !== null) {
-            return $this->activeImporter->getSavedUserCount();
-        }
-
-        throw new \RuntimeException('Exception while trying to return saved user count: no active importer set');
+        throw new \RuntimeException("No import reader found for type '{$fileType}'.");
     }
 
     public function updateFileImportStatus(int $importId, ImportStatusEnum $importStatus): void

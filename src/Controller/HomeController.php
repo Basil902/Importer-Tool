@@ -106,11 +106,17 @@ final class HomeController extends AbstractController
         $type = $file->guessExtension();
 
         /**
-         * guessExtension() maps csv to txt. For that reason it needs additional validation by checking
-         * the client mime type to confirm wether it's truly csv or a generic txt type.
+         * guessExtension() maps some file types to txt. Therefore it needs additional validation by checking
+         * the client mime type.
          */
         if ('txt' === $type) {
-            $type = 'text/csv' === $file->getClientMimeType() ? 'csv' : $type;
+            $mimeType = $file->getClientMimeType();
+
+            $type = match ($mimeType){
+                'text/csv' => 'csv',
+                'application/json' => 'json',
+                default => 'undefined'
+            };
         }
 
         if (!in_array($type, $allowed, true)) {
@@ -119,5 +125,4 @@ final class HomeController extends AbstractController
 
         return $type;
     }
-
 }
