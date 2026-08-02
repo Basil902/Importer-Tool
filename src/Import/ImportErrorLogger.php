@@ -24,9 +24,17 @@ final class ImportErrorLogger
         $handle = fopen($file, 'a');
 
         try {
+            
             fwrite($handle, $message . '\n');
+
         } catch (\Exception $e) {
+
             throw new \RuntimeException("Exception while trying to write to import error log: {$e}");
+        
+        } finally {
+
+            fclose($handle);
+
         }
     }
 }
