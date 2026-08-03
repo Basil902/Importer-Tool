@@ -7,16 +7,10 @@ use Exception;
 
 final class UserMapper
 {
-    public function __construct(
-        protected UserDTO $userDTO,
-    )
-    {
-    }
-
     public function mapDto(array $row): UserDTO
     {
         try {
-            $userDTO = $this->userDTO::create();
+            $userDTO = UserDTO::create();
 
             $userDTO->name = $row['Name'];
             $userDTO->email = $userDTO->validateEmail($row['Email']);
