@@ -14,17 +14,23 @@ final class UserDTO
         return new self();
     }
 
-    public function normalizeBooleanValue(string $value): bool
+    public function normalizeBooleanValue(mixed $value): bool
     {
-        return filter_var($value, FILTER_VALIDATE_BOOL);
+        $result = filter_var($value, FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE);
+        if (!null === $result) {
+            return $result;
+        }
+
+        throw new \InvalidArgumentException("The boolean value '{$result}' is invalid.");
     }
 
-    public function validateEmail(string $email): string
+    public function validateEmail(?string $email): string
     {
         if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
             return $email;
-        } else {
-            throw new \InvalidArgumentException("The e-mail format '{$email}' is not supported.");
         }
+        
+        throw new \InvalidArgumentException("The e-mail format '{$email}' is not supported.");
+        
     }
 }
