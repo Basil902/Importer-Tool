@@ -9,6 +9,7 @@ use App\Import\ImportErrorLogger;
 use App\Import\Reader\Strategy\ReaderInterface;
 use App\Import\UserMapper;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Tools\Exception\MissingColumnException;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\HttpKernel\Profiler\Profiler;
 use Symfony\Contracts\Service\Attribute\Required;
@@ -19,6 +20,7 @@ final class ImporterService
     private ImportFileLocator $importFileLocator;
     private UserMapper $userMapper;
     private ImportErrorLogger $ImportErrorLogger;
+    private const REQUIRED_COLUMNS = ['Name', 'Email', 'Role', 'isActive'];
 
     public function __construct(
         protected EntityManagerInterface $em,
@@ -64,6 +66,14 @@ final class ImporterService
 
         try {
             foreach ($importReader->read($file) as $lineNo => $data) {
+
+                # check if there are any missing headers.
+                $missing = array_diff(self::REQUIRED_COLUMNS, array_keys($data));
+
+                if ([] !== $missing) {
+                    throw new MissingColumnException(implode(',', $missing));
+                }
+
                 # the inner try/catch is for logging purposes, in case some rows are malformed. It also doesnt stop the import flow.
                 try {
                     $dto = $this->userMapper->mapDto($data);
