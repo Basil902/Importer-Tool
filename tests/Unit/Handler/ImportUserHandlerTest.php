@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\Handler;
+namespace App\Tests\Unit\Handler;
 
 use App\DTO\UserDTO;
 use App\Entity\User;

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\Import;
+namespace App\Tests\Unit\Import;
 
 use App\Import\UserMapper;
 use PHPUnit\Framework\TestCase;
