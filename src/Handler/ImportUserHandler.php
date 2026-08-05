@@ -7,10 +7,11 @@ use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Service\BatchService;
 
-final class ImportUserHandler extends BatchService
+final class ImportUserHandler
 {
     public function __construct(
-        protected EntityManagerInterface $em
+        protected EntityManagerInterface $em,
+        protected BatchService $batchService
     )
     {
     }
@@ -26,10 +27,10 @@ final class ImportUserHandler extends BatchService
 
         $this->em->persist($user);
 
-        ++ $this->processed;
+        ++ $this->batchService->processed;
 
         unset($userDTO);
 
-        $this->handleBatchClearCycle();
+        $this->batchService->handleBatchClearCycle();
     }
 }
