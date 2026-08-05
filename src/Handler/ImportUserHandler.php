@@ -7,7 +7,7 @@ use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Service\BatchService;
 
-final class ImportUserHandler
+final class ImportUserHandler implements ImportUserHandlerInterface
 {
     public function __construct(
         protected EntityManagerInterface $em,
