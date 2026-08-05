@@ -1,5 +1,7 @@
 <?php
 
+namespace App\Tests\Import;
+
 use App\Import\UserMapper;
 use PHPUnit\Framework\TestCase;
 
@@ -24,7 +26,7 @@ final class UserMapperTest extends TestCase
 
     public function testThrowsWhenEmailKeyIsMissing(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
 
         $mapper = new UserMapper();
 
@@ -37,7 +39,7 @@ final class UserMapperTest extends TestCase
 
     public function testThrowsWhenEmailIsInvalid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
 
         $mapper = new UserMapper();
 
@@ -51,7 +53,7 @@ final class UserMapperTest extends TestCase
 
     public function testThrowsWhenIsActiveKeyIsUnrecognizeable(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
 
         $mapper = new UserMapper();
 
