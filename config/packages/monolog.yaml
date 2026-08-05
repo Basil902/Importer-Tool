@@ -1,6 +1,14 @@
 monolog:
     channels:
         - deprecation # Deprecations are logged in the dedicated "deprecation" channel when it exists
+        - batch
+    
+    handlers:
+        batch:
+            type: stream
+            path: '%kernel.logs_dir%/batch.log'
+            level: debug
+            channels: batch
 
 when@dev:
     monolog:
