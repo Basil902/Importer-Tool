@@ -1,0 +1,10 @@
+vich_uploader:
+    db_driver: orm
+
+    metadata:
+            type: attribute
+
+    mappings:
+        file_imports:
+            # uri_prefix: /test_images
+            upload_destination: '%kernel.project_dir%/tests/Fixtures/Files'   
