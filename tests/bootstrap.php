@@ -11,3 +11,7 @@ if (method_exists(Dotenv::class, 'bootEnv')) {
 if ($_SERVER['APP_DEBUG']) {
     umask(0000);
 }
+
+# run migrations before phpunit tests
+passthru('php bin/console --env=test doctrine:database:create --if-not-exists --quiet');
+passthru('php bin/console --env=test doctrine:migrations:migrate --no-interaction --quiet');
