@@ -16,9 +16,9 @@ final class CSVImportReader implements ReaderInterface
         $fileStream = fopen($file, 'r');
 
         try {
-            $headers = fgetcsv($fileStream, separator: ';');
+            $headers = fgetcsv($fileStream, separator: ';', escape: '');
 
-            while (($row = fgetcsv($fileStream, separator: ';')) !== false) {
+            while (($row = fgetcsv($fileStream, separator: ';', escape: '')) !== false) {
                 // skip if row is empty
                 if (empty($row)) {
                     continue;
