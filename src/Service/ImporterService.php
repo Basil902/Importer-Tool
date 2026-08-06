@@ -4,7 +4,7 @@ namespace App\Service;
 
 use App\Entity\FileImport;
 use App\Enum\ImportStatusEnum;
-use App\Handler\ImportUserHandler;
+use App\Handler\ImportUserHandlerInterface;
 use App\Import\ImportErrorLogger;
 use App\Import\Reader\Strategy\ReaderInterface;
 use App\Import\UserMapper;
@@ -24,7 +24,7 @@ final class ImporterService
 
     public function __construct(
         protected EntityManagerInterface $em,
-        protected ImportUserHandler $importUserHandler,
+        protected ImportUserHandlerInterface $importUserHandler,
         protected BatchService $batchService,
         #[AutowireIterator('app.reader_strategy')]
         private iterable $readers,
