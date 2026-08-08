@@ -7,7 +7,7 @@ use OpenSpout\Reader\XLSX\Reader as XLSXReader;
 
 final class ExcelImportReader implements ReaderInterface
 {
-    private $acceptedTypes = ['xlsx', 'xls'];
+    private $acceptedTypes = ['xlsx', 'xls', 'excel'];
 
     public function supports(string $type): bool
     {
