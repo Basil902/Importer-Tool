@@ -3,57 +3,77 @@
 namespace App\Tests\Unit\Service;
 
 use App\Entity\FileImport;
+use App\Enum\FileTypeEnum;
+use App\Enum\ImportStatusEnum;
 use App\Handler\ImportUserHandlerInterface;
-use App\Import\Reader\Strategy\ReaderInterface;
 use App\Service\BatchService;
 use App\Service\ImporterService;
 use App\Service\ImportFileLocator;
 use Doctrine\ORM\EntityManagerInterface;
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
+use Vich\UploaderBundle\Storage\StorageInterface;
 
 final class ImporterServiceTest extends TestCase
 {
-    # &MockObject is used to define an intersection type, which is both the class on the left and a mock object.
-    private ReaderInterface&MockObject $csvImportReader;
-    private ReaderInterface&MockObject $excelImportReader;
+    # &Stub is used to define an intersection type, which is both the class on the left and a mock object.
+    private EntityManagerInterface&Stub $em;
+    private ImportUserHandlerInterface&Stub $importUserHandler;
+    private BatchService&Stub $batchService;
+    private StorageInterface&Stub $storage;
     private ImporterService $importerService;
     private FileImport $fileImport;
 
     protected function setUp(): void
     {
-        $em = $this->createStub(EntityManagerInterface::class);
-        $importUserHandler = $this->createStub(ImportUserHandlerInterface::class);
-        $batchService = $this->createStub(BatchService::class);
-        $this->csvImportReader = $this->createMock(ReaderInterface::class);
-        $this->excelImportReader = $this->createMock(ReaderInterface::class);
-        $this->fileImport = $this->createStub(FileImport::class);
+        $this->em = $this->createStub(EntityManagerInterface::class);
+        $this->importUserHandler = $this->createStub(ImportUserHandlerInterface::class);
+        $this->batchService = $this->createStub(BatchService::class);
+        $this->fileImport = $this->createFileImport();
 
         $this->importerService = new ImporterService(
-            $em,
-            $importUserHandler,
-            $batchService,
-            [$this->csvImportReader, $this->excelImportReader],
+            $this->em,
+            $this->importUserHandler,
+            $this->batchService,
+            [],
         );
 
-        $fileImportLocator = $this->createStub(ImportFileLocator::class);
-        $this->importerService->setImportFileLocator($fileImportLocator);
+        $this->storage = $this->createStub(StorageInterface::class);
+        $this->storage->method('resolvePath')->willReturn(__DIR__.'/Fixtures/Files/users.csv');
+        
+        $this->importerService->setImportFileLocator(new ImportFileLocator($this->storage));
+    }
+
+    public function createFileImport(): FileImport
+    {
+        $fileImport = new FileImport();
+
+        $fileImport->fileName = 'users.csv';
+        $fileImport->fileType = FileTypeEnum::CSV;
+        $fileImport->uploadedAt = new \DateTimeImmutable();
+        $fileImport->updatedAt = new \DateTimeImmutable();
+        $fileImport->status = ImportStatusEnum::STATUS_UPLOADED;
+
+        return $fileImport;
     }
 
     public function testThrowsWhenNoReaderSupportsType(): void
     {
         $this->expectException(RuntimeException::class);
 
-        $this->csvImportReader
-            ->expects($this->once())
-            ->method('supports')
-            ->willReturn(false);
-        $this->excelImportReader
-            ->expects($this->once())
-            ->method('supports')
-            ->willReturn(false);
+        $this->importerService->execute($this->fileImport, 'csv', 1);
+    }
 
-        $this->importerService->execute($this->fileImport, 'xml', 1);
+    public function testLocatorExceptionPropagates(): void
+    {
+        $this->expectException(RuntimeException::class);
+
+        $this->storage = $this->createStub(StorageInterface::class);
+        $this->storage->method('resolvePath')->willReturn('tmp/nonexistand-file.csv');
+        
+        $this->importerService->setImportFileLocator(new ImportFileLocator($this->storage));
+
+        $this->importerService->execute($this->fileImport, 'csv', 1);
     }
 }
