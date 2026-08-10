@@ -17,7 +17,7 @@ final class UserDTO
     public function normalizeBooleanValue(mixed $value): bool
     {
         $result = filter_var($value, FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE);
-        if (!null === $result) {
+        if (null !== $result) {
             return $result;
         }
 
