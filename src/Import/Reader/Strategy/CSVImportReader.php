@@ -2,6 +2,7 @@
 
 namespace App\Import\Reader\Strategy;
 
+use App\Import\UnreadeableFileException;
 use Generator;
 
 final class CSVImportReader implements ReaderInterface
@@ -17,6 +18,10 @@ final class CSVImportReader implements ReaderInterface
 
         try {
             $headers = fgetcsv($fileStream, separator: ';', escape: '');
+
+            if (0 === filesize($file) || false === $headers) {
+                throw new UnreadeableFileException("CSV file '{$file}' is empty or malformed.");
+            }
 
             while (($row = fgetcsv($fileStream, separator: ';', escape: '')) !== false) {
                 // skip if row is empty

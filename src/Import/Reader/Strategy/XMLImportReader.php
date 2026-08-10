@@ -2,6 +2,7 @@
 
 namespace App\Import\Reader\Strategy;
 
+use App\Import\UnreadeableFileException;
 use DOMDocument;
 use Generator;
 use XMLReader;
@@ -19,8 +20,14 @@ final class XMLImportReader implements ReaderInterface
         $reader->open($file);
         # $doc allocates memory for a node and its children, for example person in this case
         $doc = new DOMDocument();
+        libxml_use_internal_errors(true);
+        libxml_clear_errors();
 
         try {
+            if (false === $reader->read() && LIBXML_ERR_FATAL === libxml_get_last_error()->level){
+                throw new UnreadeableFileException("XML file '{$file}' is empty or malformed.");
+            }
+
             /**
              * The while loop positions the readers internal cursor at the right spot, before the main loop starts.
              * The cursor is going over the nodes until it finds the node person, then it stops there.

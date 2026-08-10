@@ -3,7 +3,9 @@
 namespace App\Import\Reader\Strategy;
 
 use Generator;
+use OpenSpout\Common\Exception\IOException;
 use OpenSpout\Reader\XLSX\Reader as XLSXReader;
+use App\Import\UnreadeableFileException;
 
 final class ExcelImportReader implements ReaderInterface
 {
@@ -17,7 +19,13 @@ final class ExcelImportReader implements ReaderInterface
     public function read(string $file): Generator
     {
         $reader = new XLSXReader();
-        $reader->open($file);
+
+        try {
+            $reader->open($file);
+        } catch (IOException $e) {
+            throw new UnreadeableFileException("Excel file '{$file}' is empty or malformed.");
+        }
+        
 
         try {
             foreach ($reader->getSheetIterator() as $sheet) {
