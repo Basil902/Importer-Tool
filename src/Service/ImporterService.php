@@ -56,16 +56,17 @@ final class ImporterService
         $this->profiler = $profiler;
     }
 
-    public function execute(FileImport $file, string $fileType, int $fileImportId): void
+    public function execute(FileImport $file, string $fileType): void
     {
-        $file = $this->importFileLocator->getFileToImport($file);
+        $filePath = $this->importFileLocator->getFileToImport($file);
         $importReader = $this->readerFor($fileType);
+        $fileId = $file->id;
         # disable profiler to reduce memory usage
         $this->disableProfiler();
-        $this->updateFileImportStatus($fileImportId, ImportStatusEnum::STATUS_PROCESSING);
+        $this->updateFileImportStatus($fileId, ImportStatusEnum::STATUS_PROCESSING);
 
         try {
-            foreach ($importReader->read($file) as $lineNo => $data) {
+            foreach ($importReader->read($filePath) as $lineNo => $data) {
 
                 # check if there are any missing headers.
                 $missing = array_diff(self::REQUIRED_COLUMNS, array_keys($data));
@@ -79,16 +80,16 @@ final class ImporterService
                     $dto = $this->userMapper->mapDto($data);
                     $this->importUserHandler->handleUserData($dto);
                 } catch (\Throwable $e) {
-                    $this->ImportErrorLogger->log("Error while processing file with ID {$fileImportId}: row $lineNo: {$e->getMessage()}");
+                    $this->ImportErrorLogger->log("Error while processing file with ID {$fileId}: row $lineNo: {$e->getMessage()}");
                 }     
             }
 
             $this->batchService->finalize();
-            $this->updateFileImportStatus($fileImportId, ImportStatusEnum::STATUS_PROCESSED);
+            $this->updateFileImportStatus($fileId, ImportStatusEnum::STATUS_PROCESSED);
             return;
 
         } catch (\Throwable $e) {
-            $this->updateFileImportStatus($fileImportId, ImportStatusEnum::STATUS_ERROR);
+            $this->updateFileImportStatus($fileId, ImportStatusEnum::STATUS_ERROR);
             throw $e;
         }
          

@@ -57,7 +57,7 @@ final class ImporterServiceTest extends KernelTestCase
 
         $type = $this->getType($this->fileImportMissingColumns);
 
-        $importerService->execute($this->fileImportMissingColumns, $type, $this->fileImportMissingColumns->id);
+        $importerService->execute($this->fileImportMissingColumns, $type);
     }
 
     public static function emptyFileProvider(): array
@@ -78,7 +78,7 @@ final class ImporterServiceTest extends KernelTestCase
         $importerService = self::getContainer()->get(ImporterService::class);
         $emptyFileFixture = $this->emptyFileFor($type);
 
-        $importerService->execute($emptyFileFixture, $type, $emptyFileFixture->id);
+        $importerService->execute($emptyFileFixture, $type);
     }
 
     public function testEndToEndImportProcessSucceeds(): void
@@ -87,7 +87,7 @@ final class ImporterServiceTest extends KernelTestCase
 
         $type = $this->getType($this->fileImportCsv);
         
-        $importerService->execute($this->fileImportCsv, $type, $this->fileImportCsv->id);
+        $importerService->execute($this->fileImportCsv, $type);
         $this->em->refresh($this->fileImportCsv);
         $user = $this->userRepository->findOneBy(['email' => 'david@test.com']);
 

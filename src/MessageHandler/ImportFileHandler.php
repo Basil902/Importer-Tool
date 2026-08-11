@@ -27,6 +27,6 @@ final class ImportFileHandler
             throw new \RuntimeException("No file with id '{$message->importFileId}' and type '{$message->importFileType}' found.");
         }
 
-        $this->importerService->execute($file, $message->importFileType, $message->importFileId);
+        $this->importerService->execute($file, $message->importFileType);
     }
 }

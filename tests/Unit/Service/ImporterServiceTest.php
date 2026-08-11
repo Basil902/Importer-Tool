@@ -62,7 +62,7 @@ final class ImporterServiceTest extends TestCase
     {
         $this->expectException(RuntimeException::class);
 
-        $this->importerService->execute($this->fileImport, 'csv', 1);
+        $this->importerService->execute($this->fileImport, 'csv');
     }
 
     public function testLocatorExceptionPropagates(): void
@@ -71,9 +71,8 @@ final class ImporterServiceTest extends TestCase
 
         $this->storage = $this->createStub(StorageInterface::class);
         $this->storage->method('resolvePath')->willReturn('tmp/nonexistand-file.csv');
-        
         $this->importerService->setImportFileLocator(new ImportFileLocator($this->storage));
 
-        $this->importerService->execute($this->fileImport, 'csv', 1);
+        $this->importerService->execute($this->fileImport, 'csv');
     }
 }
