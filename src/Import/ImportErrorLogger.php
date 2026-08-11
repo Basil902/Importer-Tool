@@ -25,7 +25,7 @@ final class ImportErrorLogger
 
         try {
             
-            fwrite($handle, $message . '\n');
+            fwrite($handle, $message . "\n");
 
         } catch (\Exception $e) {
 
