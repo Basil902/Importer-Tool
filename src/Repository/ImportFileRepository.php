@@ -2,21 +2,21 @@
 
 namespace App\Repository;
 
-use App\Entity\FileImport;
+use App\Entity\ImportFile;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<FileImport>
+ * @extends ServiceEntityRepository<ImportFile>
  */
-class FileImportRepository extends ServiceEntityRepository
+class ImportFileRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, FileImport::class);
+        parent::__construct($registry, ImportFile::class);
     }
 
-    public function findOneByName(string $fileName): ?FileImport
+    public function findOneByName(string $fileName): ?ImportFile
     {
         return $this->createQueryBuilder('f')
             ->andWhere('f.fileName = :val')
@@ -26,7 +26,7 @@ class FileImportRepository extends ServiceEntityRepository
     }
 
 //    /**
-//     * @return FileImport[] Returns an array of FileImport objects
+//     * @return ImportFile[] Returns an array of ImpoortFile objects
 //     */
 //    public function findByExampleField($value): array
 //    {
@@ -40,7 +40,7 @@ class FileImportRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?FileImport
+//    public function findOneBySomeField($value): ?ImportFile
 //    {
 //        return $this->createQueryBuilder('f')
 //            ->andWhere('f.exampleField = :val')

@@ -2,13 +2,13 @@
 
 namespace App\Tests\Integration;
 
-use App\Entity\FileImport;
+use App\Entity\ImportFile;
 use App\Enum\FileTypeEnum;
 use App\Enum\ImportStatusEnum;
 use App\Import\UnreadeableFileException;
 use App\Repository\UserRepository;
 use App\Service\ImporterService;
-use App\Tests\Factory\FileImportFactory;
+use App\Tests\Factory\ImportFileFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\Exception\MissingColumnException;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -16,12 +16,12 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 final class ImporterServiceTest extends KernelTestCase
 {
-    private FileImport $fileImportCsv;
-    private FileImport $fileImportMissingColumns;
-    private FileImport $fileImportEmptyCsv;
-    private FileImport $fileImportEmptyExcel;
-    private FileImport $fileImportEmptyJson;
-    private FileImport $fileImportEmptyXml;
+    private ImportFile $importFileCsv;
+    private ImportFile $importFileMissingColumns;
+    private ImportFile $importFileEmptyCsv;
+    private ImportFile $importFileEmptyExcel;
+    private ImportFile $importFileEmptyJson;
+    private ImportFile $importFileEmptyXml;
     private EntityManagerInterface $em;
     private UserRepository $userRepository;
 
@@ -30,22 +30,22 @@ final class ImporterServiceTest extends KernelTestCase
         self::bootKernel();
         $this->em = self::getContainer()->get(EntityManagerInterface::class);
         $this->userRepository = self::getContainer()->get(UserRepository::class);
-        $factory = new FileImportFactory();
+        $factory = new ImportFileFactory();
 
-        $this->fileImportCsv = $factory->create('users.csv', FileTypeEnum::CSV);
-        $this->fileImportMissingColumns = $factory->create('missing_columns.csv', FileTypeEnum::CSV);
-        $this->fileImportEmptyCsv = $factory->create('empty_file.csv', FileTypeEnum::CSV);
-        $this->fileImportEmptyExcel = $factory->create('empty_file.xlsx', FileTypeEnum::EXCEL);
-        $this->fileImportEmptyJson = $factory->create('empty_file.json', FileTypeEnum::JSON);
-        $this->fileImportEmptyXml = $factory->create('empty_file.xml', FileTypeEnum::XML);
+        $this->importFileCsv = $factory->create('users.csv', FileTypeEnum::CSV);
+        $this->importFileMissingColumns = $factory->create('missing_columns.csv', FileTypeEnum::CSV);
+        $this->importFileEmptyCsv = $factory->create('empty_file.csv', FileTypeEnum::CSV);
+        $this->importFileEmptyExcel = $factory->create('empty_file.xlsx', FileTypeEnum::EXCEL);
+        $this->importFileEmptyJson = $factory->create('empty_file.json', FileTypeEnum::JSON);
+        $this->importFileEmptyXml = $factory->create('empty_file.xml', FileTypeEnum::XML);
 
 
-        $this->em->persist($this->fileImportCsv);
-        $this->em->persist($this->fileImportMissingColumns);
-        $this->em->persist($this->fileImportEmptyCsv);
-        $this->em->persist($this->fileImportEmptyExcel);
-        $this->em->persist($this->fileImportEmptyJson);
-        $this->em->persist($this->fileImportEmptyXml);
+        $this->em->persist($this->importFileCsv);
+        $this->em->persist($this->importFileMissingColumns);
+        $this->em->persist($this->importFileEmptyCsv);
+        $this->em->persist($this->importFileEmptyExcel);
+        $this->em->persist($this->importFileEmptyJson);
+        $this->em->persist($this->importFileEmptyXml);
         $this->em->flush();
     }
 
@@ -55,9 +55,9 @@ final class ImporterServiceTest extends KernelTestCase
 
         $importerService = self::getContainer()->get(ImporterService::class);
 
-        $type = $this->getType($this->fileImportMissingColumns);
+        $type = $this->getType($this->importFileMissingColumns);
 
-        $importerService->execute($this->fileImportMissingColumns, $type);
+        $importerService->execute($this->importFileMissingColumns, $type);
     }
 
     public static function emptyFileProvider(): array
@@ -85,32 +85,32 @@ final class ImporterServiceTest extends KernelTestCase
     {
         $importerService = self::getContainer()->get(ImporterService::class);
 
-        $type = $this->getType($this->fileImportCsv);
+        $type = $this->getType($this->importFileCsv);
         
-        $importerService->execute($this->fileImportCsv, $type);
-        $this->em->refresh($this->fileImportCsv);
+        $importerService->execute($this->importFileCsv, $type);
+        $this->em->refresh($this->importFileCsv);
         $user = $this->userRepository->findOneBy(['email' => 'david@test.com']);
 
 
-        $this->assertSame(ImportStatusEnum::STATUS_PROCESSED, $this->fileImportCsv->status);
+        $this->assertSame(ImportStatusEnum::STATUS_PROCESSED, $this->importFileCsv->status);
         $this->assertSame(10, $this->userRepository->count([]));
         $this->assertNotNull($user);
         $this->assertSame('david@test.com', $user->email);
         $this->assertSame('dev', $user->role);
     }
 
-    protected function emptyFileFor(string $type): FileImport
+    protected function emptyFileFor(string $type): ImportFile
     {
         return match ($type) {
-            'csv' => $this->fileImportEmptyCsv,
-            'xlsx' => $this->fileImportEmptyExcel,
-            'json' => $this->fileImportEmptyJson,
-            'xml' => $this->fileImportEmptyXml,
+            'csv' => $this->importFileEmptyCsv,
+            'xlsx' => $this->importFileEmptyExcel,
+            'json' => $this->importFileEmptyJson,
+            'xml' => $this->importFileEmptyXml,
             default => throw new \RuntimeException("Undefined type '{$type}'."),
         };
     }
 
-    protected function getType(FileImport $file): string
+    protected function getType(ImportFile $file): string
     {
         return $file->fileType->value;
     }

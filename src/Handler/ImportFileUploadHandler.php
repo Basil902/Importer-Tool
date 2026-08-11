@@ -2,7 +2,7 @@
 
 namespace App\Handler;
 
-use App\Entity\FileImport;
+use App\Entity\ImportFile;
 use App\Enum\FileTypeEnum;
 use App\Enum\ImportStatusEnum;
 use App\Service\ImportFileLocator;
@@ -21,7 +21,7 @@ final class ImportFileUploadHandler
     {
     }
 
-    public function handleUploadedFile(FileImport $file, string $name, string $type): void
+    public function handleUploadedFile(ImportFile $file, string $name, string $type): void
     {
         $normalizedType = FileTypeEnum::normalizeExtension($type);
 
@@ -33,7 +33,7 @@ final class ImportFileUploadHandler
         $this->em->flush();
     }
 
-    public function deleteUploadedFile(FileImport $file)
+    public function deleteUploadedFile(ImportFile $file)
     {
         $path = $this->importFileLocator->getFileToImport($file);
 

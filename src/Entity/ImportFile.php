@@ -4,21 +4,21 @@ namespace App\Entity;
 
 use App\Enum\FileTypeEnum;
 use App\Enum\ImportStatusEnum;
-use App\Repository\FileImportRepository;
+use App\Repository\ImportFileRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\HttpFoundation\File\File;
 use Vich\UploaderBundle\Mapping\Attribute as Vich;
 
-#[ORM\Entity(repositoryClass: FileImportRepository::class)]
+#[ORM\Entity(repositoryClass: ImportFileRepository::class)]
 #[Vich\Uploadable]
-class FileImport
+class ImportFile
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     public int $id;
 
-    #[Vich\UploadableField(mapping: 'file_imports', fileNameProperty: 'fileName')]
+    #[Vich\UploadableField(mapping: 'import_files', fileNameProperty: 'fileName')]
     public ?File $file = null;
 
     #[ORM\Column(length: 255)]

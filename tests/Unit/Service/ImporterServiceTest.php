@@ -2,7 +2,7 @@
 
 namespace App\Tests\Unit\Service;
 
-use App\Entity\FileImport;
+use App\Entity\ImportFile;
 use App\Enum\FileTypeEnum;
 use App\Enum\ImportStatusEnum;
 use App\Handler\ImportUserHandlerInterface;
@@ -23,14 +23,14 @@ final class ImporterServiceTest extends TestCase
     private BatchService&Stub $batchService;
     private StorageInterface&Stub $storage;
     private ImporterService $importerService;
-    private FileImport $fileImport;
+    private ImportFile $importFile;
 
     protected function setUp(): void
     {
         $this->em = $this->createStub(EntityManagerInterface::class);
         $this->importUserHandler = $this->createStub(ImportUserHandlerInterface::class);
         $this->batchService = $this->createStub(BatchService::class);
-        $this->fileImport = $this->createFileImport();
+        $this->importFile = $this->createImportFile();
 
         $this->importerService = new ImporterService(
             $this->em,
@@ -45,24 +45,24 @@ final class ImporterServiceTest extends TestCase
         $this->importerService->setImportFileLocator(new ImportFileLocator($this->storage));
     }
 
-    public function createFileImport(): FileImport
+    public function createimportFile(): ImportFile
     {
-        $fileImport = new FileImport();
+        $importFile = new ImportFile();
 
-        $fileImport->fileName = 'users.csv';
-        $fileImport->fileType = FileTypeEnum::CSV;
-        $fileImport->uploadedAt = new \DateTimeImmutable();
-        $fileImport->updatedAt = new \DateTimeImmutable();
-        $fileImport->status = ImportStatusEnum::STATUS_UPLOADED;
+        $importFile->fileName = 'users.csv';
+        $importFile->fileType = FileTypeEnum::CSV;
+        $importFile->uploadedAt = new \DateTimeImmutable();
+        $importFile->updatedAt = new \DateTimeImmutable();
+        $importFile->status = ImportStatusEnum::STATUS_UPLOADED;
 
-        return $fileImport;
+        return $importFile;
     }
 
     public function testThrowsWhenNoReaderSupportsType(): void
     {
         $this->expectException(RuntimeException::class);
 
-        $this->importerService->execute($this->fileImport, 'csv');
+        $this->importerService->execute($this->importFile, 'csv');
     }
 
     public function testLocatorExceptionPropagates(): void
@@ -73,6 +73,6 @@ final class ImporterServiceTest extends TestCase
         $this->storage->method('resolvePath')->willReturn('tmp/nonexistand-file.csv');
         $this->importerService->setImportFileLocator(new ImportFileLocator($this->storage));
 
-        $this->importerService->execute($this->fileImport, 'csv');
+        $this->importerService->execute($this->importFile, 'csv');
     }
 }

@@ -2,7 +2,7 @@
 
 namespace App\Service;
 
-use App\Entity\FileImport;
+use App\Entity\ImportFile;
 use App\Enum\ImportStatusEnum;
 use App\Handler\ImportUserHandlerInterface;
 use App\Import\ImportErrorLogger;
@@ -56,14 +56,14 @@ final class ImporterService
         $this->profiler = $profiler;
     }
 
-    public function execute(FileImport $file, string $fileType): void
+    public function execute(ImportFile $file, string $fileType): void
     {
         $filePath = $this->importFileLocator->getFileToImport($file);
         $importReader = $this->readerFor($fileType);
         $fileId = $file->id;
         # disable profiler to reduce memory usage
         $this->disableProfiler();
-        $this->updateFileImportStatus($fileId, ImportStatusEnum::STATUS_PROCESSING);
+        $this->updateImportFileStatus($fileId, ImportStatusEnum::STATUS_PROCESSING);
 
         try {
             foreach ($importReader->read($filePath) as $lineNo => $data) {
@@ -85,11 +85,11 @@ final class ImporterService
             }
 
             $this->batchService->finalize();
-            $this->updateFileImportStatus($fileId, ImportStatusEnum::STATUS_PROCESSED);
+            $this->updateImportFileStatus($fileId, ImportStatusEnum::STATUS_PROCESSED);
             return;
 
         } catch (\Throwable $e) {
-            $this->updateFileImportStatus($fileId, ImportStatusEnum::STATUS_ERROR);
+            $this->updateImportFileStatus($fileId, ImportStatusEnum::STATUS_ERROR);
             throw $e;
         }
          
@@ -107,15 +107,15 @@ final class ImporterService
         throw new \RuntimeException("No import reader found for type '{$fileType}'.");
     }
 
-    public function updateFileImportStatus(int $importId, ImportStatusEnum $importStatus): void
+    public function updateImportFileStatus(int $importId, ImportStatusEnum $importStatus): void
     {
-        $fileImport = $this->em->getRepository(FileImport::class)->find($importId);
+        $importFile = $this->em->getRepository(ImportFile::class)->find($importId);
 
-        if (!$fileImport) {
+        if (!$importFile) {
             throw new \RuntimeException("No file import found with ID {$importId}.");
         }
 
-        $fileImport->status = $importStatus;
+        $importFile->status = $importStatus;
         
         $this->em->flush();
     }

@@ -6,8 +6,7 @@ use Vich\UploaderBundle\Mapping\PropertyMapping;
 use Override;
 use Vich\UploaderBundle\Naming\NamerInterface;
 
-// Eigener Namer für hochgeladende Dateien
-class FileImportNamer implements NamerInterface
+class ImportFileNamer implements NamerInterface
 {
     private const array SUPPORTED_EXTENSIONS = [
         'csv',

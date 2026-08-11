@@ -2,12 +2,12 @@
 
 namespace App\Controller;
 
-use App\Entity\FileImport;
+use App\Entity\ImportFile;
 use App\Enum\FileTypeEnum;
 use App\Form\UploadFileFormType;
 use App\Handler\ImportFileUploadHandler;
 use App\Message\ImportFileMessage;
-use App\Repository\FileImportRepository;
+use App\Repository\ImportFileRepository;
 use App\Service\ImporterService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
@@ -26,7 +26,7 @@ final class HomeController extends AbstractController
     public function __construct(
         protected EntityManagerInterface $em,
         protected ImporterService $importerService,
-        protected FileImportRepository $fileImportRepository,
+        protected ImportFileRepository $importFileRepository,
         protected ImportFileUploadHandler $importFileUploadHandler
     )
     {
@@ -42,11 +42,11 @@ final class HomeController extends AbstractController
     public function index(Request $request): Response
     {
         try {
-            $fileImport = new FileImport();
+            $importFile = new ImportFile();
 
-            $files = $this->fileImportRepository->findAll();
+            $files = $this->importFileRepository->findAll();
 
-            $form = $this->createForm(UploadFileFormType::class, $fileImport);
+            $form = $this->createForm(UploadFileFormType::class, $importFile);
 
             $form->handleRequest($request);
 
@@ -57,7 +57,7 @@ final class HomeController extends AbstractController
                 $name = $file->getClientOriginalName();
                 $type = $this->normalizeType($file);
 
-                $this->importFileUploadHandler->handleUploadedFile($fileImport, $name, $type);
+                $this->importFileUploadHandler->handleUploadedFile($importFile, $name, $type);
 
                 $this->addFlash('success', 'File upload complete');
 
@@ -78,7 +78,7 @@ final class HomeController extends AbstractController
     #[Route('/import/{fileId}', name: 'app_import')]
     public function startImport(Request $request, int $fileId): Response
     {
-        $file = $this->fileImportRepository->find($fileId);
+        $file = $this->importFileRepository->find($fileId);
         $fileType = FileTypeEnum::extension($file->fileType);
 
         if (null === $fileType) {
@@ -101,7 +101,7 @@ final class HomeController extends AbstractController
     #[Route('/delete-import/{fileId}', name: 'app_delete_file')]
     public function deleteFile(int $fileId, Request $request): Response
     {
-        $file = $this->fileImportRepository->find($fileId);
+        $file = $this->importFileRepository->find($fileId);
 
         if (!$this->isCsrfTokenValid("delete-{$fileId}", $request->request->get('_token'))) {
             throw $this->createAccessDeniedException();

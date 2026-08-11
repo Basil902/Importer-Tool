@@ -2,7 +2,7 @@
 
 namespace App\Form;
 
-use App\Entity\FileImport;
+use App\Entity\ImportFile;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -27,7 +27,7 @@ class UploadFileFormType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => FileImport::class,
+            'data_class' => ImportFile::class,
         ]);
     }
 }

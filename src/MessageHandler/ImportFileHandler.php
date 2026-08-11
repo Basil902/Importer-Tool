@@ -3,7 +3,7 @@
 namespace App\MessageHandler;
 
 use App\Message\ImportFileMessage;
-use App\Repository\FileImportRepository;
+use App\Repository\ImportFileRepository;
 use App\Service\ImporterService;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
@@ -11,7 +11,7 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 final class ImportFileHandler
 {
     public function __construct(
-        protected FileImportRepository $repository,
+        protected ImportFileRepository $repository,
         protected ImporterService $importerService
     )
     {

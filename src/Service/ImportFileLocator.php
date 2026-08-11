@@ -2,7 +2,7 @@
 
 namespace App\Service;
 
-use App\Entity\FileImport;
+use App\Entity\ImportFile;
 use Vich\UploaderBundle\Storage\StorageInterface;
 
 final class ImportFileLocator
@@ -14,7 +14,7 @@ final class ImportFileLocator
     }
 
     // return path of the file that needs to be imported
-    public function getFileToImport(FileImport $file): string
+    public function getFileToImport(ImportFile $file): string
     {
         $filePath = $this->storage->resolvePath($file, 'file');
 
