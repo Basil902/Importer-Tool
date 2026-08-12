@@ -14,23 +14,35 @@ final class UserDTO
         return new self();
     }
 
+    // type is mixed, since incomming value can be of either type string or boolean
     public function normalizeBooleanValue(mixed $value): bool
     {
-        $result = filter_var($value, FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE);
+        // additional check since null resolves to false and empty string to true
+        $invalidValues = [null, ''];
+
+        if (in_array($value, $invalidValues)) {
+            $result = null;
+        } else {
+            $result = filter_var($value, FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE);
+        }
+
         if (null !== $result) {
             return $result;
         }
 
-        throw new \InvalidArgumentException("The boolean value '{$result}' is invalid.");
+        throw new \InvalidArgumentException("The boolean value '{$value}' is invalid.");
     }
 
     public function validateEmail(?string $email): string
     {
-        if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            return $email;
+        # variable to store and return the valid e-mail, since we need the incomming $email for the exception
+        $validEmail = '';
+
+        if (null !== $email) {
+            $validEmail = filter_var(trim($email), FILTER_VALIDATE_EMAIL);
         }
-        
-        throw new \InvalidArgumentException("The e-mail format '{$email}' is not supported.");
-        
+
+        # throw on falsy values, return only valid emails
+        return $validEmail ?: throw new \InvalidArgumentException("The e-mail format '{$email}' is not supported.");
     }
 }
