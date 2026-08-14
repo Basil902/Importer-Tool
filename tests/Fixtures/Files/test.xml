@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<users>
+    <person>
+        <Name>Max Mustermann</Name>
+        <Email>maxinfinite@gmail.com</Email>
+        <Role>senior dev</Role>
+        <isActive>True</isActive>
+    </person>
+    <person>
+        <Name>Kitsune Hiku</Name>
+        <Email>khitsu@yahoo.com</Email>
+        <Role>project manager</Role>
+        <isActive>False</isActive>
+    </person>
+    <person>
+        <Name>Mucika</Name>
+        <Email>muki@webmail.com</Email>
+        <Role>dev</Role>
+        <isActive>True</isActive>
+    </person>
+</users>
