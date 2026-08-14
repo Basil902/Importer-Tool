@@ -18,7 +18,7 @@ enum FileTypeEnum: string
             'json' => self::JSON,
             'xml' => self::XML,
             'xlsx', 'xls' => self::EXCEL,
-            default => throw new InvalidArgumentException(sprintf('Unknown extension "%s"', $extension)),
+            default => throw new InvalidArgumentException(sprintf('Unknown file extension "%s"', $extension)),
         };
     }
 

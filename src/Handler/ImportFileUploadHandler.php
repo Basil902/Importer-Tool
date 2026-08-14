@@ -8,6 +8,8 @@ use App\Enum\ImportStatusEnum;
 use App\Service\ImportFileLocator;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 
 # Note: This is simply a class for handling uploaded import files. It has nothing to do with symfony messenger or messages in general.
 
@@ -21,28 +23,64 @@ final class ImportFileUploadHandler
     {
     }
 
-    public function handleUploadedFile(ImportFile $file, string $name, string $type): void
+    public function handleUploadedFile(ImportFile $importFile): void
     {
+        $uploadedFile = $importFile->file;
+
+        if (!$uploadedFile instanceof UploadedFile) {
+            throw new FileNotFoundException("The import file {$importFile->id} has no associated file. Please make sure to upload a file.");
+        }
+
+        $name = $uploadedFile->getClientOriginalName();
+
+        $type = $this->normalizeType($uploadedFile);
         $normalizedType = FileTypeEnum::normalizeExtension($type);
 
-        $file->fileName = $name;
-        $file->fileType = $normalizedType;
-        $file->status = ImportStatusEnum::STATUS_UPLOADED;
+        $importFile->fileName = $name;
+        $importFile->fileType = $normalizedType;
+        $importFile->status = ImportStatusEnum::STATUS_UPLOADED;
 
-        $this->em->persist($file);
+        $this->em->persist($importFile);
         $this->em->flush();
     }
 
     public function deleteUploadedFile(ImportFile $file)
     {
-        $path = $this->importFileLocator->getFileToImport($file);
-
-        if (!$this->fileSystem->exists($path)) {
-            throw new \RuntimeException("The file {$file->id} could not be deleted. Please check if the file exists.");
+        if (null === $file->file) {
+            throw new \LogicException("Can not delete import file entry with id {$file->id}. The entity has no associated file.");
         }
+
+        $path = $file->file->getPathname();
 
         $this->em->remove($file);
         $this->em->flush();
         $this->fileSystem->remove($path);
+    }
+
+    public function normalizeType(UploadedFile $file): string
+    {
+        $allowed = ['csv', 'json', 'xml', 'xlsx'];
+
+        $type = $file->guessExtension();
+
+        /**
+         * guessExtension() maps some file types to txt. Therefore it needs additional validation by checking
+         * the client mime type.
+         */
+        if ('txt' === $type) {
+            $mimeType = $file->getClientMimeType();
+
+            $type = match ($mimeType){
+                'text/csv' => 'csv',
+                'application/json' => 'json',
+                default => 'undefined'
+            };
+        }
+
+        if (!in_array($type, $allowed, true)) {
+            throw new \RuntimeException("The file type '{$type}' is not allowed.");
+        }
+
+        return $type;
     }
 }

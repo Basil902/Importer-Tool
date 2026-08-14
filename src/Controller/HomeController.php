@@ -12,7 +12,6 @@ use App\Service\ImporterService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -51,13 +50,7 @@ final class HomeController extends AbstractController
             $form->handleRequest($request);
 
             if ($form->isSubmitted() && $form->isValid()) {
-
-                $file = $form->get('file')->getData();
-
-                $name = $file->getClientOriginalName();
-                $type = $this->normalizeType($file);
-
-                $this->importFileUploadHandler->handleUploadedFile($importFile, $name, $type);
+                $this->importFileUploadHandler->handleUploadedFile($importFile);
 
                 $this->addFlash('success', 'File upload complete');
 
@@ -72,7 +65,7 @@ final class HomeController extends AbstractController
         
         } catch(\Exception $e) {
             throw new \Exception("Exception while creating form: {$e}");
-        }   
+        }
     }
 
     #[Route('/import/{fileId}', name: 'app_import')]
@@ -111,32 +104,5 @@ final class HomeController extends AbstractController
         $this->addFlash('success', 'File deleted successfully.');
 
         return $this->redirectToRoute('app_home');
-    }
-
-    public function normalizeType(UploadedFile $file): string
-    {
-        $allowed = ['csv', 'json', 'xml', 'xlsx'];
-
-        $type = $file->guessExtension();
-
-        /**
-         * guessExtension() maps some file types to txt. Therefore it needs additional validation by checking
-         * the client mime type.
-         */
-        if ('txt' === $type) {
-            $mimeType = $file->getClientMimeType();
-
-            $type = match ($mimeType){
-                'text/csv' => 'csv',
-                'application/json' => 'json',
-                default => 'undefined'
-            };
-        }
-
-        if (!in_array($type, $allowed, true)) {
-            throw new \RuntimeException("The file type '{$type}' is not allowed.");
-        }
-
-        return $type;
     }
 }
