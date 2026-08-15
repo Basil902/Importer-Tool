@@ -9,3 +9,4 @@ vich_uploader:
         #    uri_prefix: /products
            upload_destination: '%kernel.project_dir%/var/uploads'
            namer: App\Naming\ImportFileNamer
+           inject_on_load: true
