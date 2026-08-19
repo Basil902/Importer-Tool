@@ -19,19 +19,18 @@ class ImportFileNamer implements NamerInterface
     public function name(object $object, PropertyMapping $mapping): string
     {
         $file = $mapping->getFile($object);
-        $extension = $file->guessExtension();
 
         $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
 
-        if ('txt' === $extension) {
-            $mimeType = $file->getClientMimeType();
+        $mimeType = $file->getClientMimeType();
 
-            $extension = match ($mimeType) {
-                'text/csv' => 'csv',
-                'application/json' => 'json',
-                default => 'undefined'
-            };
-        }
+        $extension = match ($mimeType) {
+            'text/csv' => 'csv',
+            'text/xml' => 'xml',
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' => 'xlsx',
+            'application/json' => 'json',
+            default => 'undefined'
+        };
 
         if (!in_array($extension, self::SUPPORTED_EXTENSIONS)) {
             throw new \RuntimeException("File type '{$extension}' not supported.");

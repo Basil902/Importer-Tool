@@ -5,7 +5,6 @@ namespace App\Handler;
 use App\Entity\ImportFile;
 use App\Enum\FileTypeEnum;
 use App\Enum\ImportStatusEnum;
-use App\Service\ImportFileLocator;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -18,7 +17,6 @@ final class ImportFileUploadHandler
     public function __construct(
         protected EntityManagerInterface $em,
         protected Filesystem $fileSystem,
-        protected ImportFileLocator $importFileLocator
     )
     {
     }
@@ -61,21 +59,15 @@ final class ImportFileUploadHandler
     {
         $allowed = ['csv', 'json', 'xml', 'xlsx'];
 
-        $type = $file->guessExtension();
+        $mimeType = $file->getClientMimeType();
 
-        /**
-         * guessExtension() maps some file types to txt. Therefore it needs additional validation by checking
-         * the client mime type.
-         */
-        if ('txt' === $type) {
-            $mimeType = $file->getClientMimeType();
-
-            $type = match ($mimeType){
-                'text/csv' => 'csv',
-                'application/json' => 'json',
-                default => 'undefined'
-            };
-        }
+        $type = match ($mimeType){
+            'text/csv' => 'csv',
+            'text/xml' => 'xml',
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' => 'xlsx',
+            'application/json' => 'json',
+            default => 'undefined'
+        };
 
         if (!in_array($type, $allowed, true)) {
             throw new \RuntimeException("The file type '{$type}' is not allowed.");
