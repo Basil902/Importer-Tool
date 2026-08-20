@@ -10,3 +10,7 @@ body {
 .import-processed {
     color: greenyellow
 }
+
+.import-error {
+    color: red
+}

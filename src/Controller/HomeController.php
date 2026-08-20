@@ -12,8 +12,10 @@ use App\Service\ImporterService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\EventStreamResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\ServerEvent;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Service\Attribute\Required;
@@ -104,5 +106,32 @@ final class HomeController extends AbstractController
         $this->addFlash('success', 'File deleted successfully.');
 
         return $this->redirectToRoute('app_home');
+    }
+
+    #[Route('/live-progress', name: 'live_progress')]
+    public function liveProgress(): EventStreamResponse
+    {
+        session_write_close();
+        set_time_limit(0);
+        
+        return new EventStreamResponse(function (EventStreamResponse $response): void {
+            while (true) {
+                if (connection_aborted()) {
+                    return;
+                }
+
+                $this->em->clear();
+
+                $importStatus = [];
+                foreach ($this->importFileRepository->findAll() as $importFile) {
+                    $importStatus[$importFile->id] = $importFile->status;
+                }
+
+                $response->sendEvent(new ServerEvent(json_encode($importStatus)));
+                
+                sleep(3);
+            }
+        });
+
     }
 }

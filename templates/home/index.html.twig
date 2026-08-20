@@ -2,6 +2,8 @@
 
 {% block title %}Hello HomeController!{% endblock %}
 
+{% block importmap %}{{ importmap(['app', 'home']) }}{% endblock %}
+
 {% block body %}
 <style>
     .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
@@ -31,20 +33,24 @@
 
             <form action="{{ path('app_import', { 'fileId': file.id }) }}" method="POST">
 
-                <div style="display:flex;align-items:center;justify-content:center;gap:10px;">
+                <div style="display:flex;align-items:center;justify-content:center;gap:10px;"
+                    class="importFileEl">
                     {{ file.id }}.
                     {{ file.fileName }}
 
-                    {% if 'uploaded' == file.status.value %}
-                        <button type="submit">
-                            Import
-                        </button>
+                    <div class="statusEl" data-file-id="{{ file.id }}">
+                        {% if 'uploaded' == file.status.value %}
+                            <button type="submit">
+                                Import
+                            </button>
 
-                    {% else %}
-                        <p class={{ "import-" ~ file.status.value }}>
-                            {{ file.status.value }}
-                        </p> 
-                    {% endif %}
+                        {% else %}
+                            <p class="{{ "import-" ~ file.status.value }} importStatus">
+                                {{ file.status.value }}
+                            </p> 
+                        {% endif %}
+                    </div>
+                    
 
                 <button type="submit" form="delete-file-{{ file.id }}"
                 style="color:red;font-weight:bold;background-color:transparent;border:none;cursor:pointer;">
