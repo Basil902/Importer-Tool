@@ -1,4 +1,5 @@
 {% extends 'base.html.twig' %}
+{% form_theme form 'themes/error_red_text.html.twig' %}
 
 {% block title %}Hello HomeController!{% endblock %}
 
@@ -23,6 +24,10 @@
     </div>
 
     <div>
+        <div style="color:red;">
+            {{ form_errors(form.file) }}
+        </div>
+
         {{ form(form) }}
     </div>
     

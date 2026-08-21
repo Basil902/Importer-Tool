@@ -61,7 +61,7 @@ final class HomeController extends AbstractController
 
             return $this->render('home/index.html.twig', [
                 'controller_name' => 'HomeController',
-                'form' => $form->createView(),
+                'form' => $form,
                 'files' => $files
             ]);
         
@@ -113,7 +113,7 @@ final class HomeController extends AbstractController
     {
         session_write_close();
         set_time_limit(0);
-        
+
         return new EventStreamResponse(function (EventStreamResponse $response): void {
             while (true) {
                 if (connection_aborted()) {
