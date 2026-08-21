@@ -26,7 +26,7 @@ final class ImportFileUploadHandler
         $uploadedFile = $importFile->file;
 
         if (!$uploadedFile instanceof UploadedFile) {
-            throw new FileNotFoundException("The import file {$importFile->id} has no associated file. Please make sure to upload a file.");
+            throw new FileNotFoundException("The uploaded file has no associated file. Please make sure to upload a file.");
         }
 
         $name = $uploadedFile->getClientOriginalName();
@@ -66,7 +66,7 @@ final class ImportFileUploadHandler
             'text/xml' => 'xml',
             'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' => 'xlsx',
             'application/json' => 'json',
-            default => 'undefined'
+            default => $file->getClientOriginalExtension(),
         };
 
         if (!in_array($type, $allowed, true)) {
