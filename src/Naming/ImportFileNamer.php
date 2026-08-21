@@ -22,7 +22,7 @@ class ImportFileNamer implements NamerInterface
 
         $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
 
-        $mimeType = $file->getClientMimeType();
+        $mimeType = $file->getMimeType();
 
         $extension = match ($mimeType) {
             'text/csv' => 'csv',
