@@ -129,7 +129,7 @@ final class HomeController extends AbstractController
 
                 $response->sendEvent(new ServerEvent(json_encode($importStatus)));
                 
-                sleep(3);
+                sleep(1);
             }
         });
 
