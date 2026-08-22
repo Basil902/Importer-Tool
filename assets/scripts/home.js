@@ -1,17 +1,28 @@
 const eventSource = new EventSource('/live-progress');
+const disabledStatuses = ['processing', 'processed'];
 
 // listen to all events (without a specific type)
 eventSource.onmessage = (event) => {
     const statuses = JSON.parse(event.data);
-    console.log('test');
 
     for (const [fileId, status] of Object.entries(statuses)) {
-        const el = document.querySelector(`.statusEl[data-file-id="${fileId}"]`);
+        const el = document.querySelector(`.importFileEl[data-file-id="${fileId}"]`);
         if (!el) continue;
 
-        el.innerHTML = 'uploaded' === status 
-            ? `<button type="submit"> Import </button>`
-            : `<p class="import-${status} importStatus">${status}</p>`;
+        for (const node of el.childNodes) {
+
+            let shouldDisable = disabledStatuses.includes(status);
+
+            if ('P' === node.tagName ) {
+                node.className = `import-${status}`
+                node.innerHTML = status;
+            } 
+            // Check if button element is the first child of its type, to avoid disabling the delete button
+            else if ('BUTTON' === node.tagName && node.matches(':first-of-type')) {
+                console.log(shouldDisable);
+                shouldDisable ? node.setAttribute('disabled', '') : '';
+            }
+        }
     }
 };
 

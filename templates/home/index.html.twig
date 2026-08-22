@@ -39,23 +39,18 @@
             <form action="{{ path('app_import', { 'fileId': file.id }) }}" method="POST">
 
                 <div style="display:flex;align-items:center;justify-content:center;gap:10px;"
-                    class="importFileEl">
+                    class="importFileEl"
+                    data-file-id="{{ file.id }}">
                     {{ file.id }}.
                     {{ file.fileName }}
 
-                    <div class="statusEl" data-file-id="{{ file.id }}">
-                        {% if 'uploaded' == file.status.value %}
-                            <button type="submit">
-                                Import
-                            </button>
+                    <p class="{{ "import-" ~ file.status.value }} importStatus">
+                        {{ file.status.value }}
+                    </p>
 
-                        {% else %}
-                            <p class="{{ "import-" ~ file.status.value }} importStatus">
-                                {{ file.status.value }}
-                            </p> 
-                        {% endif %}
-                    </div>
-                    
+                    <button type="submit">
+                        Import
+                    </button>                    
 
                 <button type="submit" form="delete-file-{{ file.id }}"
                 style="color:red;font-weight:bold;background-color:transparent;border:none;cursor:pointer;">
