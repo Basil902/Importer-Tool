@@ -11,6 +11,10 @@ body {
     color: greenyellow
 }
 
+.import-uploaded {
+    color: lightskyblue;
+}
+
 .import-error {
     color: red
 }
