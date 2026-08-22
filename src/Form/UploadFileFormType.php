@@ -23,7 +23,11 @@ class UploadFileFormType extends AbstractType
             ],
             'constraints' => [
                 new File(
-                    extensions: ['csv' => ["text/plain", "text/csv", "application/csv", "text/x-comma-separated-values", "text/x-csv"], 'json', 'xml', 'xlsx', 'txt'],
+                    extensions: ['csv' => ["text/plain", "text/csv", "application/csv", "text/x-comma-separated-values", "text/x-csv"],
+                    'json' => ['application/json', 'application/schema+json', 'text/plain'], 
+                    'xml', 
+                    'xlsx', 
+                    'txt'],
                     extensionsMessage: 'File type {{ extension }} is not allowed.',
                 ),
             ],
