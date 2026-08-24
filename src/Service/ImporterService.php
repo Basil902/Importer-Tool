@@ -80,7 +80,13 @@ final class ImporterService
                     $dto = $this->userMapper->mapDto($data);
                     $this->importUserHandler->handleUserData($dto);
                 } catch (\Throwable $e) {
-                    $this->ImportErrorLogger->log("Error while processing file with ID {$fileId}: row $lineNo: {$e->getMessage()}");
+                    $this->ImportErrorLogger->log(
+                        sprintf("Error while processing file with ID %s: row %s: %s Row content: %s",
+                        $fileId,
+                        $lineNo,
+                        $e->getMessage(),
+                        implode(', ', array_map(function($row){return $row;}, $data))
+                        ));    
                 }     
             }
 
