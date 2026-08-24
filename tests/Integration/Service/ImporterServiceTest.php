@@ -6,7 +6,7 @@ use App\Entity\ImportFile;
 use App\Enum\FileTypeEnum;
 use App\Enum\ImportStatusEnum;
 use App\Import\UnreadeableFileException;
-use App\Repository\UserRepository;
+use App\Repository\EmployeeRepository;
 use App\Service\ImporterService;
 use App\Tests\Factory\ImportFileFactory;
 use Doctrine\ORM\EntityManagerInterface;
@@ -24,18 +24,18 @@ final class ImporterServiceTest extends KernelTestCase
     private ImportFile $importFileEmptyXml;
     private ImportFile $malformedEmailXml;
     private EntityManagerInterface $em;
-    private UserRepository $userRepository;
+    private EmployeeRepository $employeeRepository;
     private string $logFilePath;
 
     public function setUp(): void
     {
         self::bootKernel();
         $this->em = self::getContainer()->get(EntityManagerInterface::class);
-        $this->userRepository = self::getContainer()->get(UserRepository::class);
+        $this->employeeRepository = self::getContainer()->get(EmployeeRepository::class);
         $this->logFilePath = dirname(__DIR__, 3).'/var/log/import_error.log';
         $factory = new ImportFileFactory();
 
-        $this->importFileCsv = $factory->create('users.csv', FileTypeEnum::CSV);
+        $this->importFileCsv = $factory->create('employees.csv', FileTypeEnum::CSV);
         $this->importFileMissingColumns = $factory->create('missing_columns.csv', FileTypeEnum::CSV);
         $this->importFileEmptyCsv = $factory->create('empty_file.csv', FileTypeEnum::CSV);
         $this->importFileEmptyExcel = $factory->create('empty_file.xlsx', FileTypeEnum::EXCEL);
@@ -93,14 +93,14 @@ final class ImporterServiceTest extends KernelTestCase
         
         $importerService->execute($this->importFileCsv, $type);
         $this->em->refresh($this->importFileCsv);
-        $user = $this->userRepository->findOneBy(['email' => 'david@test.com']);
+        $employee = $this->employeeRepository->findOneBy(['email' => 'david@test.com']);
 
 
         $this->assertSame(ImportStatusEnum::STATUS_PROCESSED, $this->importFileCsv->status);
-        $this->assertSame(10, $this->userRepository->count([]));
-        $this->assertNotNull($user);
-        $this->assertSame('david@test.com', $user->email);
-        $this->assertSame('dev', $user->role);
+        $this->assertSame(10, $this->employeeRepository->count([]));
+        $this->assertNotNull($employee);
+        $this->assertSame('david@test.com', $employee->email);
+        $this->assertSame('dev', $employee->role);
     }
 
     public function testWritesToLogFileIfMalformedRow(): void

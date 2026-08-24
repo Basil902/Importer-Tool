@@ -2,33 +2,33 @@
 
 namespace App\Tests\Unit\Import;
 
-use App\Import\UserMapper;
+use App\Import\EmployeeMapper;
 use PHPUnit\Framework\TestCase;
 
-final class UserMapperTest extends TestCase
+final class EmployeeMapperTest extends TestCase
 {
     public function testMapsRowToDto(): void
     {
-        $mapper = new UserMapper();
+        $mapper = new EmployeeMapper();
 
-        $userDto = $mapper->mapDto([
+        $employeeDTO = $mapper->mapDto([
             'Name' => 'Max Mustermann',
             'Email' => 'mmustermann@webmail.com',
             'Role' => 'Senior Dev',
             'isActive' => 'yes',
         ]);
 
-        $this->assertSame('Max Mustermann', $userDto->name);
-        $this->assertSame('mmustermann@webmail.com', $userDto->email);
-        $this->assertSame('Senior Dev', $userDto->role);
-        $this->assertTrue($userDto->isActive);
+        $this->assertSame('Max Mustermann', $employeeDTO->name);
+        $this->assertSame('mmustermann@webmail.com', $employeeDTO->email);
+        $this->assertSame('Senior Dev', $employeeDTO->role);
+        $this->assertTrue($employeeDTO->isActive);
     }
 
     public function testThrowsWhenEmailKeyIsMissing(): void
     {
         $this->expectException(\InvalidArgumentException::class);
 
-        $mapper = new UserMapper();
+        $mapper = new EmployeeMapper();
 
         $mapper->mapDto([
             'Name' => 'Max Mustermann',
@@ -41,7 +41,7 @@ final class UserMapperTest extends TestCase
     {
         $this->expectException(\InvalidArgumentException::class);
 
-        $mapper = new UserMapper();
+        $mapper = new EmployeeMapper();
 
         $mapper->mapDto([
             'Name' => 'Max Mustermann',
@@ -55,7 +55,7 @@ final class UserMapperTest extends TestCase
     {
         $this->expectException(\InvalidArgumentException::class);
 
-        $mapper = new UserMapper();
+        $mapper = new EmployeeMapper();
 
         $mapper->mapDto([
             'Name' => 'Max Mustermann',

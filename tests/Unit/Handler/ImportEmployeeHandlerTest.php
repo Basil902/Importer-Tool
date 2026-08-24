@@ -2,18 +2,18 @@
 
 namespace App\Tests\Unit\Handler;
 
-use App\DTO\UserDTO;
-use App\Entity\User;
-use App\Handler\ImportUserHandler;
+use App\DTO\EmployeeDTO;
+use App\Entity\Employee;
+use App\Handler\ImportEmployeeHandler;
 use App\Service\BatchService;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 
-final class ImportUserHandlerTest extends TestCase
+final class ImportEmployeeHandlerTest extends TestCase
 {
-    public function testPersistsUserFromDto(): void
+    public function testPersistsEmployeeFromDto(): void
     {
-        $dto = new UserDTO();
+        $dto = new EmployeeDTO();
 
         $dto->name = 'Max Mustermann';
         $dto->email = 'mmustermann@webmail.com';
@@ -28,11 +28,11 @@ final class ImportUserHandlerTest extends TestCase
                 $persisted = $entity;
             });
 
-        $handler = new ImportUserHandler($em, $this->createStub(BatchService::class));
+        $handler = new ImportEmployeeHandler($em, $this->createStub(BatchService::class));
 
-        $handler->handleUserData($dto);
+        $handler->handleEmployeeData($dto);
 
-        $this->assertInstanceOf(User::class, $persisted);
+        $this->assertInstanceOf(Employee::class, $persisted);
         $this->assertSame('Max Mustermann', $persisted->name);
         $this->assertSame('mmustermann@webmail.com', $persisted->email);
         $this->assertSame('Senior Dev', $persisted->role);
@@ -41,7 +41,7 @@ final class ImportUserHandlerTest extends TestCase
 
     public function testNotifiesBatchServiceAfterPersisting(): void
     {
-        $dto = new UserDTO();
+        $dto = new EmployeeDTO();
 
         $dto->name = 'Max Mustermann';
         $dto->email = 'mmustermann@webmail.com';
@@ -55,13 +55,13 @@ final class ImportUserHandlerTest extends TestCase
             ->expects($this->once())
             ->method('handleBatchClearCycle');
 
-        $handler = new ImportUserHandler($em, $batch);
-        $handler->handleUserData($dto);
+        $handler = new ImportEmployeeHandler($em, $batch);
+        $handler->handleEmployeeData($dto);
     }
 
-    private static function makeDto(string $name, string $email, string $role): UserDTO
+    private static function makeDto(string $name, string $email, string $role): EmployeeDTO
     {
-        $dto = UserDTO::create();
+        $dto = EmployeeDTO::create();
 
         $dto->name = $name;
         $dto->email = $email;
@@ -71,7 +71,7 @@ final class ImportUserHandlerTest extends TestCase
         return $dto;
     }
 
-    public static function usersToProcess(): array
+    public static function employeesToProcess(): array
     {
         return [
             self::makeDto('Max Mustermann', 'mmustermann@webmail.com', 'Senior Dev'),
@@ -79,7 +79,7 @@ final class ImportUserHandlerTest extends TestCase
         ];
     }
 
-    public function testNotifiesBatchServiceForEachProcessedUser(): void
+    public function testNotifiesBatchServiceForEachProcessedEmployee(): void
     {
         $em = $this->createMock(EntityManagerInterface::class);
         $em
@@ -91,10 +91,10 @@ final class ImportUserHandlerTest extends TestCase
             ->expects($this->exactly(2))
             ->method('handleBatchClearCycle');
 
-        $handler = new ImportUserHandler($em, $batch);
+        $handler = new ImportEmployeeHandler($em, $batch);
         
-        foreach (self::usersToProcess() as $user) {
-            $handler->handleUserData($user);
+        foreach (self::employeesToProcess() as $employee) {
+            $handler->handleEmployeeData($employee);
         }
 
         $this->assertSame(2, $batch->processed);

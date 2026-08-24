@@ -23,7 +23,7 @@ final class ImportFileUploadHandlerTest extends KernelTestCase
     {
         $this->importFile = new ImportFile();
         
-        $this->importFile->fileName = 'users.csv';
+        $this->importFile->fileName = 'employees.csv';
         $this->importFile->fileType = FileTypeEnum::CSV;
         $this->importFile->status = ImportStatusEnum::STATUS_UPLOADED;
         $this->importFile->uploadedAt = new \DateTimeImmutable();

@@ -5,7 +5,7 @@ namespace App\Tests\Unit\Service;
 use App\Entity\ImportFile;
 use App\Enum\FileTypeEnum;
 use App\Enum\ImportStatusEnum;
-use App\Handler\ImportUserHandlerInterface;
+use App\Handler\ImportEmployeeHandlerInterface;
 use App\Service\BatchService;
 use App\Service\ImporterService;
 use App\Service\ImportFileLocator;
@@ -19,7 +19,7 @@ final class ImporterServiceTest extends TestCase
 {
     # &Stub is used to define an intersection type, which is both the class on the left and a mock object.
     private EntityManagerInterface&Stub $em;
-    private ImportUserHandlerInterface&Stub $importUserHandler;
+    private ImportEmployeeHandlerInterface&Stub $importEmployeeHandler;
     private BatchService&Stub $batchService;
     private StorageInterface&Stub $storage;
     private ImporterService $importerService;
@@ -28,19 +28,19 @@ final class ImporterServiceTest extends TestCase
     protected function setUp(): void
     {
         $this->em = $this->createStub(EntityManagerInterface::class);
-        $this->importUserHandler = $this->createStub(ImportUserHandlerInterface::class);
+        $this->importEmployeeHandler = $this->createStub(ImportEmployeeHandlerInterface::class);
         $this->batchService = $this->createStub(BatchService::class);
         $this->importFile = $this->createImportFile();
 
         $this->importerService = new ImporterService(
             $this->em,
-            $this->importUserHandler,
+            $this->importEmployeeHandler,
             $this->batchService,
             [],
         );
 
         $this->storage = $this->createStub(StorageInterface::class);
-        $this->storage->method('resolvePath')->willReturn(__DIR__.'/Fixtures/Files/users.csv');
+        $this->storage->method('resolvePath')->willReturn(__DIR__.'/Fixtures/Files/employees.csv');
         
         $this->importerService->setImportFileLocator(new ImportFileLocator($this->storage));
     }
@@ -49,7 +49,7 @@ final class ImporterServiceTest extends TestCase
     {
         $importFile = new ImportFile();
 
-        $importFile->fileName = 'users.csv';
+        $importFile->fileName = 'employees.csv';
         $importFile->fileType = FileTypeEnum::CSV;
         $importFile->uploadedAt = new \DateTimeImmutable();
         $importFile->updatedAt = new \DateTimeImmutable();

@@ -2,12 +2,12 @@
 
 namespace App\Entity;
 
-use App\Repository\UserRepository;
+use App\Repository\EmployeeRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: UserRepository::class)]
-#[ORM\Table(name: '`user`')]
-class User
+#[ORM\Entity(repositoryClass: EmployeeRepository::class)]
+#[ORM\Table(name: '`employee`')]
+class Employee
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]

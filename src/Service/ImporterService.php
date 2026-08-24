@@ -4,10 +4,10 @@ namespace App\Service;
 
 use App\Entity\ImportFile;
 use App\Enum\ImportStatusEnum;
-use App\Handler\ImportUserHandlerInterface;
+use App\Handler\ImportEmployeeHandlerInterface;
 use App\Import\ImportErrorLogger;
 use App\Import\Reader\Strategy\ReaderInterface;
-use App\Import\UserMapper;
+use App\Import\EmployeeMapper;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\Exception\MissingColumnException;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
@@ -18,13 +18,13 @@ final class ImporterService
 {
     private ?Profiler $profiler = null;
     private ImportFileLocator $importFileLocator;
-    private UserMapper $userMapper;
-    private ImportErrorLogger $ImportErrorLogger;
+    private EmployeeMapper $employeeMapper;
+    private ImportErrorLogger $importErrorLogger;
     private const REQUIRED_COLUMNS = ['Name', 'Email', 'Role', 'isActive'];
 
     public function __construct(
         protected EntityManagerInterface $em,
-        protected ImportUserHandlerInterface $importUserHandler,
+        protected ImportEmployeeHandlerInterface $importEmployeeHandler,
         protected BatchService $batchService,
         #[AutowireIterator('app.reader_strategy')]
         private iterable $readers,
@@ -39,15 +39,15 @@ final class ImporterService
     }
 
     #[Required]
-    public function setUserMapper(UserMapper $userMapper): void
+    public function setEmployeeMapper(EmployeeMapper $employeeMapper): void
     {
-        $this->userMapper = $userMapper;
+        $this->employeeMapper = $employeeMapper;
     }
 
     #[Required]
-    public function setImportErrorLogger(ImportErrorLogger $ImportErrorLogger): void
+    public function setImportErrorLogger(ImportErrorLogger $importErrorLogger): void
     {
-        $this->ImportErrorLogger = $ImportErrorLogger;
+        $this->importErrorLogger = $importErrorLogger;
     }
 
     #[Required]
@@ -77,10 +77,10 @@ final class ImporterService
 
                 # the inner try/catch is for logging purposes, in case some rows are malformed. It also doesnt stop the import flow.
                 try {
-                    $dto = $this->userMapper->mapDto($data);
-                    $this->importUserHandler->handleUserData($dto);
+                    $dto = $this->employeeMapper->mapDto($data);
+                    $this->importEmployeeHandler->handleEmployeeData($dto);
                 } catch (\Throwable $e) {
-                    $this->ImportErrorLogger->log(
+                    $this->importErrorLogger->log(
                         sprintf("Error while processing file with ID %s: row %s: %s Row content: %s",
                         $fileId,
                         $lineNo,

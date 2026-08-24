@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<users>
+<employees>
     <person>
         <Name>Max Mustermann</Name>
         <Email>maxinfinite@gmail.com</Email>
@@ -18,4 +18,4 @@
         <Role>dev</Role>
         <isActive>True</isActive>
     </person>
-</users>
+</employees>

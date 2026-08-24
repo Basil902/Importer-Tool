@@ -2,12 +2,12 @@
 
 namespace App\Tests\Unit\DTO;
 
-use App\DTO\UserDTO;
+use App\DTO\EmployeeDTO;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-final class UserDtoTest extends TestCase
+final class EmployeeDtoTest extends TestCase
 {
     public static function validInputProvider(): array
     {
@@ -24,10 +24,10 @@ final class UserDtoTest extends TestCase
     #[DataProvider('validInputProvider')]
     public function testNormalizesBooleanValue(mixed $input): void
     {
-        $userDto = new UserDTO();
+        $employeeDTO = new EmployeeDTO();
         $expectedValues = [true, false];
 
-        $value = $userDto->normalizeBooleanValue($input);
+        $value = $employeeDTO->normalizeBooleanValue($input);
 
         $this->assertContains($value, $expectedValues);
     }
@@ -51,8 +51,8 @@ final class UserDtoTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
 
-        $userDto = new UserDTO();
-        $userDto->normalizeBooleanValue($input);
+        $employeeDTO = new EmployeeDTO();
+        $employeeDTO->normalizeBooleanValue($input);
     }
 
     public static function validEmailProvider(): array
@@ -67,9 +67,9 @@ final class UserDtoTest extends TestCase
     #[DataProvider('validEmailProvider')]
     public function testReturnsValidEmail(mixed $email): void
     {
-        $userDto = new UserDTO();
+        $employeeDTO = new EmployeeDTO();
 
-        $result = $userDto->validateEmail($email);
+        $result = $employeeDTO->validateEmail($email);
 
         $this->assertContains($result, ['david@gmail.com', 'david@sub.gmail.com']);
     }
@@ -95,8 +95,8 @@ final class UserDtoTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
 
-        $userDto = new UserDTO();
-        $userDto->validateEmail($email);
+        $employeeDTO = new EmployeeDTO();
+        $employeeDTO->validateEmail($email);
     }
 
 }

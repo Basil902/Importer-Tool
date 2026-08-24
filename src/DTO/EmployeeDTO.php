@@ -2,7 +2,7 @@
 
 namespace App\DTO;
 
-final class UserDTO
+final class EmployeeDTO
 {
     public string $name;
     public string $email;

@@ -4,7 +4,7 @@ namespace App\Tests\Tests\Controller;
 
 use App\Entity\ImportFile;
 use App\Repository\ImportFileRepository;
-use App\Repository\UserRepository;
+use App\Repository\EmployeeRepository;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Filesystem\Filesystem;
 use Vich\UploaderBundle\Storage\StorageInterface;
@@ -61,7 +61,7 @@ class HomeControllerTest extends WebTestCase
         $client->followRedirects();
         $client->disableReboot();
         $fileRepository = self::getContainer()->get(ImportFileRepository::class);
-        $userRepository  = self::getContainer()->get(UserRepository::class);
+        $employeeRepository  = self::getContainer()->get(EmployeeRepository::class);
         $storage = self::getContainer()->get(StorageInterface::class);
 
         $crawler = $client->request('GET', '/');
@@ -87,7 +87,7 @@ class HomeControllerTest extends WebTestCase
 
         $this->assertSame(1, $fileRepository->count([]));
         $this->assertSame('processed', $importFile->status->value);
-        $this->assertSame(3, $userRepository->count([]));
+        $this->assertSame(3, $employeeRepository->count([]));
         $this->assertFileExists($storage->resolvePath($importFile, 'file'));
         $this->assertSelectorTextContains('p', 'processed');
     }
