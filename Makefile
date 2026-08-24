@@ -31,3 +31,9 @@ server:
 
 messenger-worker-async:
 	symfony console messenger:consume async -vv
+
+clear-cache:
+	symfony console cache:clear
+
+clear-cache-test:
+	symfony console cache:clear --env=test
