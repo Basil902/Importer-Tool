@@ -39,8 +39,8 @@ final class ImportFileUploadHandlerTest extends KernelTestCase
         $storage = self::getContainer()->get(StorageInterface::class);
 
         $tmp = sys_get_temp_dir() . '/' . uniqid() . '.xml';
-        copy(__DIR__ . '/../../Fixtures/Files/test.xml', $tmp);
-        $this->importFile->setFile(new UploadedFile($tmp, 'test.xml', null, null, true));
+        copy(__DIR__ . '/../../Fixtures/Files/test_to_upload.xml', $tmp);
+        $this->importFile->setFile(new UploadedFile($tmp, 'test_to_upload.xml', null, null, true));
         
         $importFileUploader->handleUploadedFile($this->importFile);
         $importFile = $repository->findOneBy([], ['id' => 'DESC']);
@@ -81,8 +81,8 @@ final class ImportFileUploadHandlerTest extends KernelTestCase
         $repository = self::getContainer()->get(ImportFileRepository::class);
 
         $tmp = sys_get_temp_dir() . '/' . uniqid() . '.xml';
-        copy(__DIR__ . '/../../Fixtures/Files/test.xml', $tmp);
-        $this->importFile->setFile(new UploadedFile($tmp, 'test.xml', null, null, true));
+        copy(__DIR__ . '/../../Fixtures/Files/test_to_upload.xml', $tmp);
+        $this->importFile->setFile(new UploadedFile($tmp, 'test_to_upload.xml', null, null, true));
         $importFileUploader->handleUploadedFile($this->importFile);
 
         $this->assertFileExists($this->importFile->file->getPathname());
