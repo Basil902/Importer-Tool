@@ -22,14 +22,17 @@ final class ImporterServiceTest extends KernelTestCase
     private ImportFile $importFileEmptyExcel;
     private ImportFile $importFileEmptyJson;
     private ImportFile $importFileEmptyXml;
+    private ImportFile $malformedEmailXml;
     private EntityManagerInterface $em;
     private UserRepository $userRepository;
+    private string $logFilePath;
 
     public function setUp(): void
     {
         self::bootKernel();
         $this->em = self::getContainer()->get(EntityManagerInterface::class);
         $this->userRepository = self::getContainer()->get(UserRepository::class);
+        $this->logFilePath = dirname(__DIR__, 3).'/var/log/import_error.log';
         $factory = new ImportFileFactory();
 
         $this->importFileCsv = $factory->create('users.csv', FileTypeEnum::CSV);
@@ -38,7 +41,7 @@ final class ImporterServiceTest extends KernelTestCase
         $this->importFileEmptyExcel = $factory->create('empty_file.xlsx', FileTypeEnum::EXCEL);
         $this->importFileEmptyJson = $factory->create('empty_file.json', FileTypeEnum::JSON);
         $this->importFileEmptyXml = $factory->create('empty_file.xml', FileTypeEnum::XML);
-
+        $this->malformedEmailXml = $factory->create('malformed_email.xml', FileTypeEnum::XML);
 
         $this->em->persist($this->importFileCsv);
         $this->em->persist($this->importFileMissingColumns);
@@ -46,6 +49,7 @@ final class ImporterServiceTest extends KernelTestCase
         $this->em->persist($this->importFileEmptyExcel);
         $this->em->persist($this->importFileEmptyJson);
         $this->em->persist($this->importFileEmptyXml);
+        $this->em->persist($this->malformedEmailXml);
         $this->em->flush();
     }
 
@@ -99,6 +103,20 @@ final class ImporterServiceTest extends KernelTestCase
         $this->assertSame('dev', $user->role);
     }
 
+    public function testWritesToLogFileIfMalformedRow(): void
+    {
+        $importerService = self::getContainer()->get(ImporterService::class);
+
+        $type = $this->getType($this->malformedEmailXml);
+
+        $importerService->execute($this->malformedEmailXml, $type);
+
+        $content = file_get_contents($this->logFilePath);
+
+        $this->assertStringNotEqualsFile($this->logFilePath, '');
+        $this->assertStringContainsString('Error while processing file with ID', $content);
+    }
+
     protected function emptyFileFor(string $type): ImportFile
     {
         return match ($type) {
@@ -113,5 +131,13 @@ final class ImporterServiceTest extends KernelTestCase
     protected function getType(ImportFile $file): string
     {
         return $file->fileType->value;
+    }
+
+    protected function tearDown(): void
+    {
+        if (isset($this->logFilePath)) {
+            file_put_contents($this->logFilePath, "");   
+        }
+        parent::tearDown();
     }
 }
