@@ -36,6 +36,21 @@ class ImportFile
     #[ORM\Column(length: 255, enumType: ImportStatusEnum::class)]
     public ImportStatusEnum $status;
 
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'import_files')]
+    private User $user;
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): self
+    {
+        $this->user = $user;
+
+        return $this;
+    }
+
     public function setFile(?File $file = null): void
     {
         $this->file = $file;
