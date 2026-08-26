@@ -6,6 +6,7 @@ use App\Enum\FileTypeEnum;
 use App\Enum\ImportStatusEnum;
 use App\Repository\ImportFileRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\JoinColumn;
 use Symfony\Component\HttpFoundation\File\File;
 use Vich\UploaderBundle\Mapping\Attribute as Vich;
 
@@ -37,14 +38,15 @@ class ImportFile
     public ImportStatusEnum $status;
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'import_files')]
+    #[JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private User $user;
 
-    public function getUser(): ?User
+    public function getUser(): User
     {
         return $this->user;
     }
 
-    public function setUser(?User $user): self
+    public function setUser(User $user): self
     {
         $this->user = $user;
 
