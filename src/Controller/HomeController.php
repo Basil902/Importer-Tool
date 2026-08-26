@@ -18,8 +18,10 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ServerEvent;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Service\Attribute\Required;
 
+#[IsGranted('ROLE_USER')]
 final class HomeController extends AbstractController
 {
     private MessageBusInterface $bus;
