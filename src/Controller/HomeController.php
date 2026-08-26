@@ -46,6 +46,7 @@ final class HomeController extends AbstractController
     {
         try {
             $importFile = new ImportFile();
+            $importFile->setUser($this->getUser());
 
             $files = $this->importFileRepository->findAll();
 
