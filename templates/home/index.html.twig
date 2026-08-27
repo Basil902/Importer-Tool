@@ -34,36 +34,41 @@
     <br><br>
     <div style="display:flex; gap: 5px; margin-top: 20px;width: 100%; height: 100%;">
         <div>
-            {% for file in files %}
 
-            <form action="{{ path('app_import', { 'fileId': file.id }) }}" method="POST">
+            {% if app.user %}
+            
+                {% for file in app.user.getFiles %}
 
-                <div style="display:flex;align-items:center;justify-content:center;gap:10px;"
-                    class="importFileEl"
-                    data-file-id="{{ file.id }}">
-                    {{ file.id }}.
-                    {{ file.fileName }}
+                    <form action="{{ path('app_import', { 'fileId': file.id }) }}" method="POST">
 
-                    <p class="{{ "import-" ~ file.status.value }} importStatus">
-                        {{ file.status.value }}
-                    </p>
+                        <div style="display:flex;align-items:center;justify-content:center;gap:10px;"
+                            class="importFileEl"
+                            data-file-id="{{ file.id }}">
+                            {{ file.id }}.
+                            {{ file.fileName }}
 
-                    <button type="submit">
-                        Import
-                    </button>                    
+                            <p class="{{ "import-" ~ file.status.value }} importStatus">
+                                {{ file.status.value }}
+                            </p>
 
-                <button type="submit" form="delete-file-{{ file.id }}"
-                style="color:red;font-weight:bold;background-color:transparent;border:none;cursor:pointer;">
-                    X
-                </button>
-                </div>
-            </form>
+                            <button type="submit">
+                                Import
+                            </button>                    
 
-            <form id="delete-file-{{ file.id }}" action="{{ path('app_delete_file', { 'fileId': file.id }) }}" method="POST">
-                <input type="hidden" name="_token" value="{{ csrf_token('delete-' ~ file.id) }}">
-            </form>
+                        <button type="submit" form="delete-file-{{ file.id }}"
+                        style="color:red;font-weight:bold;background-color:transparent;border:none;cursor:pointer;">
+                            X
+                        </button>
+                        </div>
+                    </form>
 
-            {% endfor %}
+                    <form id="delete-file-{{ file.id }}" action="{{ path('app_delete_file', { 'fileId': file.id }) }}" method="POST">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete-' ~ file.id) }}">
+                    </form>
+
+                    {% endfor %}
+
+            {% endif %}
 
         </div>        
 
