@@ -48,7 +48,6 @@ final class HomeController extends AbstractController
             $importFile = new ImportFile();
             $importFile->setUser($this->getUser());
 
-            $files = $this->importFileRepository->findAll();
 
             $form = $this->createForm(UploadFileFormType::class, $importFile);
 
@@ -65,7 +64,6 @@ final class HomeController extends AbstractController
             return $this->render('home/index.html.twig', [
                 'controller_name' => 'HomeController',
                 'form' => $form,
-                'files' => $files
             ]);
         
         } catch(\Exception $e) {
