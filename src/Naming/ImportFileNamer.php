@@ -29,7 +29,7 @@ class ImportFileNamer implements NamerInterface
             'text/xml' => 'xml',
             'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' => 'xlsx',
             'application/json' => 'json',
-            default => $file->getClientOriginalExtension(),
+            default => strtolower($file->getClientOriginalExtension()),
         };
 
         if (!in_array($extension, self::SUPPORTED_EXTENSIONS)) {
