@@ -20,7 +20,7 @@ final class EmployeeDTO
         // additional check since null resolves to false and empty string to true
         $invalidValues = [null, ''];
 
-        if (in_array($value, $invalidValues)) {
+        if (in_array($value, $invalidValues, true)) {
             $result = null;
         } else {
             $result = filter_var($value, FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE);

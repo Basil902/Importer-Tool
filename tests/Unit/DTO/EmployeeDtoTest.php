@@ -18,6 +18,7 @@ final class EmployeeDtoTest extends TestCase
             'yes with spaces' => [' yes '],
             'decimal 1.0' => [1.0],
             'string 0' => ['0'],
+            'false' => [false],
         ];
     }
     
