@@ -16,11 +16,11 @@ As of now, the importer tool only works with files that contain flat, tabular da
 
 ### Tech stack
 
-Backend: Symfony (PHP)
-Frontend: JavaScript
-Templates: Twig
-Database: MySQL
-Testing: PHPUnit
+Backend: Symfony (PHP)\
+Frontend: JavaScript\
+Templates: Twig\
+Database: MySQL\
+Testing: PHPUnit\
 
 ### Hosting
 
