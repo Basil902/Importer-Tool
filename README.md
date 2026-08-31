@@ -20,7 +20,7 @@ Backend: Symfony (PHP)\
 Frontend: JavaScript\
 Templates: Twig\
 Database: MySQL\
-Testing: PHPUnit\
+Testing: PHPUnit
 
 ### Hosting
 
