@@ -23,12 +23,18 @@
         {% endfor %}
     </div>
 
-    <div>
+    <div style="display:flex;">
         <div style="color:red;">
             {{ form_errors(form.file) }}
         </div>
 
         {{ form(form) }}
+
+        {% if app.user %}
+            <div style="margin-left: 50%">
+                <a href="{{ logout_path() }}" style="color:white;">Logout</a>
+            </div>
+        {% endif %}
     </div>
     
     <br><br>
