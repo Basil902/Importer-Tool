@@ -24,4 +24,4 @@ Testing: PHPUnit
 
 ### Hosting
 
-Currently the application is being hosted locally, and thus can only be accessed via localhost.
+There's no live deployment right now. The app runs only on a local dev server during development.
