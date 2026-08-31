@@ -39,16 +39,16 @@ class ImportFile implements \Serializable
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'import_files')]
     #[JoinColumn(nullable: false, onDelete: 'CASCADE')]
-    private User $user;
+    private User $owner;
 
-    public function getUser(): User
+    public function getOwner(): User
     {
-        return $this->user;
+        return $this->owner;
     }
 
-    public function setUser(User $user): self
+    public function setOwner(User $user): self
     {
-        $this->user = $user;
+        $this->owner = $user;
 
         return $this;
     }
