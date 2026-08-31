@@ -1,6 +1,7 @@
 # Importer-Tool
 
-<img width="1920" height="934" alt="Importer-TOol homepage" src="https://github.com/user-attachments/assets/13bcb487-b520-4e79-9274-b990defe1015" />
+<img width="1919" height="893" alt="Importer-Tool-Screenshot" src="https://github.com/user-attachments/assets/c79259f8-ce8b-4896-8d56-e8ce36caa251" />
+
 
 A simple importer tool for reading data from files of various types. The extracted data is saved in a MySQL database. Currently, the supported file types include CSV, XLS / XLSX, JSON and XML.
 
