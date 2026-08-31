@@ -35,7 +35,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?string $password = null;
 
-    #[ORM\OneToMany(targetEntity: ImportFile::class, mappedBy: 'user', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: ImportFile::class, mappedBy: 'owner', orphanRemoval: true)]
     private Collection $importFiles;
 
     public function __construct()
@@ -55,7 +55,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         if (!$this->importFiles->contains($file)) {
             $this->importFiles->add($file);
-            $file->setUser($this);
+            $file->setOwner($this);
         }
 
         return $this;
