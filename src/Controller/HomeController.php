@@ -46,7 +46,7 @@ final class HomeController extends AbstractController
     {
         try {
             $importFile = new ImportFile();
-            $importFile->setUser($this->getUser());
+            $importFile->setOwner($this->getUser());
 
 
             $form = $this->createForm(UploadFileFormType::class, $importFile);
@@ -99,8 +99,9 @@ final class HomeController extends AbstractController
     {
         $file = $this->importFileRepository->find($fileId);
 
-        if (!$this->isCsrfTokenValid("delete-{$fileId}", $request->request->get('_token'))) {
-            throw $this->createAccessDeniedException();
+        if (!$this->isCsrfTokenValid("delete-{$fileId}", $request->request->get('_token'))
+            || $file->getOwner() !== $this->getUser()) {
+            throw $this->createAccessDeniedException('You don\'t have permission to perform this action.');
         }
 
         $this->importFileUploadHandler->deleteUploadedFile($file);
