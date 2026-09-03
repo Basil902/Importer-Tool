@@ -12,7 +12,7 @@ use Vich\UploaderBundle\Mapping\Attribute as Vich;
 
 #[ORM\Entity(repositoryClass: ImportFileRepository::class)]
 #[Vich\Uploadable]
-class ImportFile implements \Serializable
+class ImportFile
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -73,7 +73,7 @@ class ImportFile implements \Serializable
     }
 
     /** @see \Serializable::unserialize() */
-    public function unserialize($serialized)
+    public function unserialize(string $serialized)
     {
         list (
             $this->id,
