@@ -32,7 +32,6 @@ final class ImportFileUploadHandlerTest extends KernelTestCase
         $user = $userFactory->create();
         $this->importFile->setOwner($user);
 
-        $em->persist($user);
         $em->persist($this->importFile);
     }    
 
