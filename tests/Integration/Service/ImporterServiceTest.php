@@ -9,6 +9,7 @@ use App\Import\UnreadeableFileException;
 use App\Repository\EmployeeRepository;
 use App\Service\ImporterService;
 use App\Tests\Factory\ImportFileFactory;
+use App\Tests\Factory\UserFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\Exception\MissingColumnException;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -33,15 +34,24 @@ final class ImporterServiceTest extends KernelTestCase
         $this->em = self::getContainer()->get(EntityManagerInterface::class);
         $this->employeeRepository = self::getContainer()->get(EmployeeRepository::class);
         $this->logFilePath = dirname(__DIR__, 3).'/var/log/import_error.log';
-        $factory = new ImportFileFactory();
+        $fileFactory = new ImportFileFactory();
+        $user = (new UserFactory())->create();
 
-        $this->importFileCsv = $factory->create('employees.csv', FileTypeEnum::CSV);
-        $this->importFileMissingColumns = $factory->create('missing_columns.csv', FileTypeEnum::CSV);
-        $this->importFileEmptyCsv = $factory->create('empty_file.csv', FileTypeEnum::CSV);
-        $this->importFileEmptyExcel = $factory->create('empty_file.xlsx', FileTypeEnum::EXCEL);
-        $this->importFileEmptyJson = $factory->create('empty_file.json', FileTypeEnum::JSON);
-        $this->importFileEmptyXml = $factory->create('empty_file.xml', FileTypeEnum::XML);
-        $this->malformedEmailXml = $factory->create('malformed_email.xml', FileTypeEnum::XML);
+        $this->importFileCsv = $fileFactory->create('employees.csv', FileTypeEnum::CSV);
+        $this->importFileMissingColumns = $fileFactory->create('missing_columns.csv', FileTypeEnum::CSV);
+        $this->importFileEmptyCsv = $fileFactory->create('empty_file.csv', FileTypeEnum::CSV);
+        $this->importFileEmptyExcel = $fileFactory->create('empty_file.xlsx', FileTypeEnum::EXCEL);
+        $this->importFileEmptyJson = $fileFactory->create('empty_file.json', FileTypeEnum::JSON);
+        $this->importFileEmptyXml = $fileFactory->create('empty_file.xml', FileTypeEnum::XML);
+        $this->malformedEmailXml = $fileFactory->create('malformed_email.xml', FileTypeEnum::XML);
+
+        $this->importFileCsv->setOwner($user);
+        $this->importFileMissingColumns->setOwner($user);
+        $this->importFileEmptyCsv->setOwner($user);
+        $this->importFileEmptyExcel->setOwner($user);
+        $this->importFileEmptyJson->setOwner($user);
+        $this->importFileEmptyXml->setOwner($user);
+        $this->malformedEmailXml->setOwner($user);
 
         $this->em->persist($this->importFileCsv);
         $this->em->persist($this->importFileMissingColumns);
