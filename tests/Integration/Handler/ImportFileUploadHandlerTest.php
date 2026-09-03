@@ -7,6 +7,8 @@ use App\Enum\FileTypeEnum;
 use App\Enum\ImportStatusEnum;
 use App\Handler\ImportFileUploadHandler;
 use App\Repository\ImportFileRepository;
+use App\Tests\Factory\ImportFileFactory;
+use App\Tests\Factory\UserFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use LogicException;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -22,12 +24,16 @@ final class ImportFileUploadHandlerTest extends KernelTestCase
     public function setUp(): void
     {
         $this->importFile = new ImportFile();
+        $fileFactory = new ImportFileFactory();
+        $userFactory = new UserFactory(); 
+        $em = self::getContainer()->get(EntityManagerInterface::class);
         
-        $this->importFile->fileName = 'employees.csv';
-        $this->importFile->fileType = FileTypeEnum::CSV;
-        $this->importFile->status = ImportStatusEnum::STATUS_UPLOADED;
-        $this->importFile->uploadedAt = new \DateTimeImmutable();
-        $this->importFile->updatedAt = new \DateTimeImmutable();
+        $this->importFile = $fileFactory->create('employees.csv', FileTypeEnum::CSV);
+        $user = $userFactory->create();
+        $this->importFile->setOwner($user);
+
+        $em->persist($user);
+        $em->persist($this->importFile);
     }    
 
     public function testHandlesFileUpload(): void
