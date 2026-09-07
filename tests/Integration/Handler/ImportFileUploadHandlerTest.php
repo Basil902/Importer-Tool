@@ -7,8 +7,8 @@ use App\Enum\FileTypeEnum;
 use App\Enum\ImportStatusEnum;
 use App\Handler\ImportFileUploadHandler;
 use App\Repository\ImportFileRepository;
+use App\Repository\UserRepository;
 use App\Tests\Factory\ImportFileFactory;
-use App\Tests\Factory\UserFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use LogicException;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -25,20 +25,17 @@ final class ImportFileUploadHandlerTest extends KernelTestCase
     {
         $this->importFile = new ImportFile();
         $fileFactory = new ImportFileFactory();
-        $userFactory = new UserFactory(); 
         $em = self::getContainer()->get(EntityManagerInterface::class);
-        
-        $this->importFile = $fileFactory->create('employees.csv', FileTypeEnum::CSV);
-        $user = $userFactory->create();
-        $this->importFile->setOwner($user);
+        $user = self::getContainer()->get(UserRepository::class)->findOneBy(['email' => 'test@mail.com']);
 
+        $this->importFile = $fileFactory->create('employees.csv', FileTypeEnum::CSV);
+        $this->importFile->setOwner($user);
         $em->persist($this->importFile);
+        $em->flush();
     }    
 
     public function testHandlesFileUpload(): void
     {
-        self::bootKernel();
-
         $importFileUploader = self::getContainer()->get(ImportFileUploadHandler::class);
         $repository = self::getContainer()->get(ImportFileRepository::class);
         $storage = self::getContainer()->get(StorageInterface::class);
