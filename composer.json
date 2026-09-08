@@ -1,4 +1,6 @@
 {
+    "name": "basil902/importer-tool",
+    "description": "A simple tool for importing files of different formats",
     "type": "project",
     "license": "proprietary",
     "minimum-stability": "stable",
