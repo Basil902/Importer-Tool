@@ -38,6 +38,7 @@ final class ImportFileUploadHandler
         $importFile->fileType = $normalizedType;
         $importFile->status = ImportStatusEnum::STATUS_UPLOADED;
 
+        $this->em->persist($importFile);
         $this->em->flush();
     }
 
