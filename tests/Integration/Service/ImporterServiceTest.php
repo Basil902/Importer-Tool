@@ -7,9 +7,9 @@ use App\Enum\FileTypeEnum;
 use App\Enum\ImportStatusEnum;
 use App\Import\UnreadeableFileException;
 use App\Repository\EmployeeRepository;
+use App\Repository\UserRepository;
 use App\Service\ImporterService;
 use App\Tests\Factory\ImportFileFactory;
-use App\Tests\Factory\UserFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\Exception\MissingColumnException;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -30,12 +30,11 @@ final class ImporterServiceTest extends KernelTestCase
 
     public function setUp(): void
     {
-        self::bootKernel();
         $this->em = self::getContainer()->get(EntityManagerInterface::class);
         $this->employeeRepository = self::getContainer()->get(EmployeeRepository::class);
         $this->logFilePath = dirname(__DIR__, 3).'/var/log/import_error.log';
+        $user = self::getContainer()->get(UserRepository::class)->findOneBy(['email' => 'test@mail.com']);
         $fileFactory = new ImportFileFactory();
-        $user = (new UserFactory())->create();
 
         $this->importFileCsv = $fileFactory->create('employees.csv', FileTypeEnum::CSV);
         $this->importFileMissingColumns = $fileFactory->create('missing_columns.csv', FileTypeEnum::CSV);
