@@ -37,7 +37,7 @@ class ImportFile implements \Serializable
     #[ORM\Column(length: 255, enumType: ImportStatusEnum::class)]
     public ImportStatusEnum $status;
 
-    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'import_files')]
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'importFile')]
     #[JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private User $owner;
 
