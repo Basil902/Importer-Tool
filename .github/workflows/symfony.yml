@@ -56,10 +56,10 @@ jobs:
         run: composer audit
 
       - name: Check Symfony console
-        run: bin/console about
+        run: php bin/console about
 
       - name: Lint container
-        run: bin/console lint:container
+        run: php bin/console lint:container
 
       - run: php bin/console importmap:install
 
