@@ -16,6 +16,9 @@ jobs:
     name: Symfony 8.4
   
     runs-on: ubuntu-latest
+
+    env:
+      SYMFONY_DEPRECATIONS_HELPER: weak
   
     services:
       mysql:
