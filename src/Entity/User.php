@@ -125,4 +125,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $data;
     }
+
+    /**
+     * Deprecated since Symfony 7.3
+     * @see UserInterface::eraseCredentials()
+     */
+    public function eraseCredentials(): void
+    {
+    }
 }
