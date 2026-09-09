@@ -52,6 +52,9 @@ jobs:
       - name: Install dependencies
         uses: ramsey/composer-install@v3
 
+      - name: Warmup cache
+        run: php bin/console cache:clear
+
       - name: Security audit of dependencies
         run: composer audit
 
