@@ -20,8 +20,17 @@ final class ImportErrorLogger
     public function log(string $message) {
 
         $file = $this->projectDir . '/var/log/import_error.log';
+
+        if (!file_exists($file)) {
+            $path = mkdir(dirname($file), 0777, true);
+            file_put_contents($path . 'import_error.log', '');
+        }
         
         $handle = fopen($file, 'a');
+
+        if (false === $handle) {
+            throw new \RuntimeException('Failed to open import error log.');
+        }
 
         try {
             
