@@ -12,7 +12,7 @@ use Vich\UploaderBundle\Mapping\Attribute as Vich;
 
 #[ORM\Entity(repositoryClass: ImportFileRepository::class)]
 #[Vich\Uploadable]
-class ImportFile implements \Serializable
+class ImportFile
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -63,21 +63,17 @@ class ImportFile implements \Serializable
         }
     }
 
-        /** @see \Serializable::serialize() */
-    public function serialize()
+    public function __serialize(): array
     {
-        return serialize(array(
-            $this->id,
-            $this->fileName,
-        ));
+        return [
+            'id' => $this->id,
+            'file_name' => $this->fileName,
+        ];
     }
 
-    /** @see \Serializable::unserialize() */
-    public function unserialize(string $serialized)
+    public function __unserialize(array $serialized): void
     {
-        list (
-            $this->id,
-            $this->fileName,
-        ) = unserialize($serialized, array('allowed_classes' => false));
+        $this->id = $serialized['id'];
+        $this->fileName = $serialized['file_name'];
     }
 }
