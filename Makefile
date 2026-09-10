@@ -1,7 +1,7 @@
 .PHONY: test test-unit test-integration test-filter test-db compile-assets server messenger-worker-async
 
 test:
-	vendor/bin/phpunit
+	php bin/phpunit
 
 test-unit:
 	vendor/bin/phpunit --testsuite unit
@@ -15,13 +15,19 @@ test-db:
 	php bin/console --env=test doctrine:migrations:migrate --no-interaction
 
 migrate:
-	php bin/console doctrine:migrations:migrate
+	php bin/console doctrine:migrations:migrate --no-interaction
 
 diff:
 	php bin/console doctrine:migrations:diff
 
 db:
 	php bin/console doctrine:migrations:create --if-not-exists
+
+load-fixtures:
+	php bin/console doctrine:fixtures:load --no-interaction
+
+load-fixtures-test:
+	php bin/console doctrine:fixtures:load --group=testing --no-interaction
 
 compile-assets:
 	php bin/console asset-map:compile
