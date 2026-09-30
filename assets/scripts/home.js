@@ -1,5 +1,5 @@
 const eventSource = new EventSource('/live-progress');
-const disabledStatuses = ['processing', 'processed'];
+const disabledStatuses = ['processing', 'processed', 'error'];
 
 // listen to all events (without a specific type)
 eventSource.onmessage = (event) => {
@@ -21,6 +21,10 @@ eventSource.onmessage = (event) => {
             else if ('BUTTON' === node.tagName && node.matches(':first-of-type')) {
                 console.log(shouldDisable);
                 shouldDisable ? node.setAttribute('disabled', '') : '';
+
+                if (node.hasAttribute('disabled')) {
+                    node.style.cursor = 'not-allowed';
+                }
             }
         }
     }
