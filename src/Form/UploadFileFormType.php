@@ -25,7 +25,7 @@ class UploadFileFormType extends AbstractType
                 new File(
                     extensions: ['csv' => ["text/plain", "text/csv", "application/csv", "text/x-comma-separated-values", "text/x-csv"],
                     'json' => ['application/json', 'application/schema+json', 'text/plain'], 
-                    'xml', 
+                    'xml' => ['application/octet-stream', 'application/xml', 'text/xml'], 
                     'xlsx', 
                     'txt'],
                     extensionsMessage: 'File type {{ extension }} is not allowed.',
