@@ -24,8 +24,10 @@ final class XMLImportReader implements ReaderInterface
         libxml_clear_errors();
 
         try {
+            $fileName = basename($file);
+
             if (false === $reader->read() && LIBXML_ERR_FATAL === libxml_get_last_error()->level){
-                throw new UnreadeableFileException("XML file '{$file}' is empty or malformed.");
+                throw new UnreadeableFileException("XML file '{$fileName}' is empty or malformed.");
             }
 
             /**
@@ -35,7 +37,11 @@ final class XMLImportReader implements ReaderInterface
             while ($reader->read()) {
                 if ('person' === $reader->name) {
                     break;
-                }
+                } 
+            }
+
+            if ('person' !== $reader->name) {
+                throw new UnreadeableFileException("XML file '{$fileName}' is empty or malformed.");
             }
 
             while($reader->name === 'person') {

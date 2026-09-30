@@ -16,14 +16,20 @@ final class JSONImportReader implements ReaderInterface
     }
 
     public function read(string $file): Generator
-    {
+    {        
+        $fileName = basename($file);
+
         try {
+            if (null === Items::fromFile($file, ['decoder' => new ExtJsonDecoder(true)])) {
+                throw new UnreadeableFileException("JSON file '{$fileName}' is empty or malformed.");
+            }
+
             foreach (Items::fromFile($file, ['decoder' => new ExtJsonDecoder(true)]) as $key => $value) {
 
                 yield $key => $value;
             }
         } catch (SyntaxErrorException $e) {
-            throw new UnreadeableFileException("JSON file '{$file}' is empty or malformed.");
+            throw new UnreadeableFileException("JSON file '{$fileName}' is empty or malformed.");
         }
     }
 }
