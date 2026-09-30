@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 {% form_theme form 'themes/error_red_text.html.twig' %}
 
-{% block title %}Hello HomeController!{% endblock %}
+{% block title %}Home{% endblock %}
 
 {% block importmap %}{{ importmap(['app', 'home']) }}{% endblock %}
 
@@ -57,7 +57,7 @@
                                 {{ file.status.value }}
                             </p>
 
-                            <button type="submit">
+                            <button type="submit" style="cursor:pointer;">
                                 Import
                             </button>                    
 
