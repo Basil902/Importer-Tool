@@ -59,13 +59,22 @@
 
                             <button type="submit" style="cursor:pointer;">
                                 Import
-                            </button>                    
+                            </button>
+
+                            <button class="viewLogsBtn" type="submit" form="view-logs-{{ file.id }}"
+                            style="cursor:pointer" hidden disabled>
+                                View logs
+                            </button>                  
 
                         <button type="submit" form="delete-file-{{ file.id }}"
                         style="color:red;font-weight:bold;background-color:transparent;border:none;cursor:pointer;">
                             X
                         </button>
                         </div>
+                    </form>
+
+                    <form id="view-logs-{{ file.id }}" action="{{ path('app_view_file_logs', { 'fileId': file.id }) }}" method="GET">
+                        <input type="hidden" value={{ file.id }}>
                     </form>
 
                     <form id="delete-file-{{ file.id }}" action="{{ path('app_delete_file', { 'fileId': file.id }) }}" method="POST">

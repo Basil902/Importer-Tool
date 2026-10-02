@@ -35,7 +35,7 @@ final class ImportFailureListener
         }
 
         $importFile = $this->importFileRepository->find($message->importFileId);
-        $this->logger->log($throwable->getMessage());
+        // $this->logger->log($throwable->getMessage());
         
         if (null !== $importFile) {
             $importFile->status = ImportStatusEnum::STATUS_ERROR;

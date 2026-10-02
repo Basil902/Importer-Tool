@@ -9,6 +9,7 @@ use App\Handler\ImportFileUploadHandler;
 use App\Message\ImportFileMessage;
 use App\Repository\ImportFileRepository;
 use App\Service\ImporterService;
+use App\Service\LogFileParser;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -25,6 +26,7 @@ use Symfony\Contracts\Service\Attribute\Required;
 final class HomeController extends AbstractController
 {
     private MessageBusInterface $bus;
+    private LogFileParser $logFileParser;
 
     public function __construct(
         protected EntityManagerInterface $em,
@@ -39,6 +41,12 @@ final class HomeController extends AbstractController
     public function setMessageBus(MessageBusInterface $bus): void
     {
         $this->bus = $bus;
+    }
+
+    #[Required]
+    public function setLogFileParser(LogFileParser $logFileParser): void
+    {
+        $this->logFileParser = $logFileParser;
     }
 
     #[Route('/', name: 'app_home')]
@@ -69,6 +77,18 @@ final class HomeController extends AbstractController
         } catch(\Exception $e) {
             throw new \Exception("Exception while creating form: {$e}");
         }
+    }
+
+    #[Route('/logs/{fileId}', name: 'app_view_file_logs')]
+    public function logs(Request $request, int $fileId): Response
+    {
+        $logFile = $this->getParameter('kernel.project_dir') . '/var/log/import_error.log';
+        $log = $this->logFileParser->parseFile($logFile, $fileId);
+
+        return $this->render('home/logs.html.twig', [
+            'fileId' => $fileId,
+            'fileLog' => $log
+        ]);
     }
 
     #[Route('/import/{fileId}', name: 'app_import')]

@@ -95,11 +95,15 @@ final class ImporterService
             return;
 
         } catch (\Throwable $e) {
+            $this->importErrorLogger->log(
+                sprintf("Error while reading file with ID %s: %s",
+                $fileId,
+                $e->getMessage()
+                ));
+                
             $this->updateImportFileStatus($fileId, ImportStatusEnum::STATUS_ERROR);
             throw $e;
         }
-         
-        
     }
 
     protected function readerFor(string $fileType): ReaderInterface
