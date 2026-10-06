@@ -6,6 +6,10 @@ class LogFileParser
 {
     public function parseFile(string $file, int $fileId): ?string
     {
+        if (!file_exists($file)) {
+            throw new \RuntimeException("Could not find log file in path: {$file}");
+        }
+
         $content = file_get_contents($file);
 
         if (!str_contains($content, $fileId)) {
@@ -20,7 +24,7 @@ class LogFileParser
             }
             
             $id = (int) $matches[1] ?? false;
-            $offset = strrpos($row, ':');
+            $offset = strpos($row, ':');
             $message = trim(substr($row, $offset + 1));
 
             if (false !== $id && $id === $fileId) {
