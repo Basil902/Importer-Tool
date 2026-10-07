@@ -10,26 +10,40 @@ class LogFileParser
             throw new \RuntimeException("Could not find log file in path: {$file}");
         }
 
-        $content = file_get_contents($file);
+        $handle = fopen($file, 'r');
 
-        if (!str_contains($content, $fileId)) {
-            return null;
+        if (false === $handle) {
+            throw new \RuntimeException("Failed to open file.");
         }
 
-        foreach (explode("\n", $content) as $row) {
-            preg_match("/ID\s({$fileId}):/", $row, $matches);
+        while (($line = fgets($handle)) !== false) {
+            $message = $this->parseLine($line, $fileId);
 
-            if ([] === $matches || false === $matches) {
-                continue;
-            }
-            
-            $id = (int) $matches[1] ?? false;
-            $offset = strpos($row, ':');
-            $message = trim(substr($row, $offset + 1));
-
-            if (false !== $id && $id === $fileId) {
+            if (null !== $message) {
+                fclose($handle);
                 return $message;
             }
+        }
+
+        fclose($handle);
+
+        return null;
+    }
+
+    private function parseLine(string $line, int $fileId): ?string
+    {
+        preg_match("/ID\s({$fileId}):/", $line, $matches);
+
+        if ([] === $matches) {
+            return null;
+        }
+        
+        $id = (int) $matches[1];
+        $offset = strpos($line, ':');
+        $message = trim(substr($line, $offset + 1));
+
+        if ($id === $fileId) {
+            return $message;
         }
 
         return null;
