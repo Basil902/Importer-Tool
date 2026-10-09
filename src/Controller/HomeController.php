@@ -82,6 +82,12 @@ final class HomeController extends AbstractController
     #[Route('/logs/{fileId}', name: 'app_view_file_logs')]
     public function logs(Request $request, int $fileId): Response
     {
+        $file = $this->em->getRepository(ImportFile::class)->find($fileId);
+
+        if ($file && $file->getOwner() !== $this->getUser()) {
+            throw $this->createAccessDeniedException('You do not have permission to view this file.');
+        }
+        
         $logFile = $this->getParameter('kernel.project_dir') . '/var/log/import_error.log';
         $log = $this->logFileParser->parseFile($logFile, $fileId);
 
