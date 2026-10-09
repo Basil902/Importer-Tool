@@ -59,4 +59,12 @@ final class LogFileParserTest extends TestCase
 
         $this->assertSame("JSON file 'malformed.json' is empty or malformed.", $message);
     }
+
+    protected function tearDown(): void
+    {
+        if (isset($this->filePath)) {
+            file_put_contents($this->filePath, "");   
+        }
+        parent::tearDown();
+    }
 }
