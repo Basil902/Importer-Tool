@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Entity\Employee;
 use App\Entity\ImportFile;
 use App\Enum\ImportStatusEnum;
 use App\Handler\ImportEmployeeHandlerInterface;
@@ -21,6 +22,7 @@ final class ImporterService
     private EmployeeMapper $employeeMapper;
     private ImportErrorLogger $importErrorLogger;
     private const REQUIRED_COLUMNS = ['Name', 'Email', 'Role', 'isActive'];
+    private array $workedOnRows = [];
 
     public function __construct(
         protected EntityManagerInterface $em,
@@ -67,18 +69,24 @@ final class ImporterService
 
         try {
             foreach ($importReader->read($filePath) as $lineNo => $data) {
-
                 # check if there are any missing headers.
                 $missing = array_diff(self::REQUIRED_COLUMNS, array_keys($data));
 
                 if ([] !== $missing) {
                     throw new MissingColumnException(implode(',', $missing));
+                }    
+
+                $this->resetWorkedOnRowsIfNeeded();
+
+                if ($this->isRowDuplicate($data)) {
+                    continue;
                 }
 
                 # the inner try/catch is for logging purposes, in case some rows are malformed. It also doesnt stop the import flow.
                 try {
                     $dto = $this->employeeMapper->mapDto($data);
                     $this->importEmployeeHandler->handleEmployeeData($dto);
+                    $this->workedOnRows[$data['email']] = true;
                 } catch (\Throwable $e) {
                     $this->importErrorLogger->log(
                         sprintf("Error while processing file with ID %s: row %s: %s Row content: %s",
@@ -128,6 +136,34 @@ final class ImporterService
         $importFile->status = $importStatus;
         
         $this->em->flush();
+    }
+
+    private function isRowDuplicate(array $line): bool
+    {
+        $email = $line['Email'];
+
+        if (isset($this->workedOnRows[$email])) {
+            return true;
+        }
+
+        // if no duplicate is found in the workednOnRows array, check the database
+        $employee = $this->em->getRepository(Employee::class)->findOneByEmail($email);
+
+        if (null !== $employee) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private function resetWorkedOnRowsIfNeeded(): void
+    {
+        $processedRows = $this->batchService->getProcessedRows();
+
+        // empty workedOnArray after every 500 processed rows to free up RAM
+        if (0 === $processedRows % 500) {
+            $this->workedOnRows = [];
+        }
     }
 
     private function disableProfiler(): void

@@ -16,6 +16,15 @@ class EmployeeRepository extends ServiceEntityRepository
         parent::__construct($registry, Employee::class);
     }
 
+    public function findOneByEmail(string $email): ?Employee
+    {
+        return $this->createQueryBuilder('e')
+            ->andWhere('e.email = :val')
+            ->setParameter('val', $email)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
     //    /**
     //     * @return Employee[] Returns an array of Employee objects
     //     */
