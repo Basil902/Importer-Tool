@@ -86,7 +86,7 @@ final class ImporterService
                 try {
                     $dto = $this->employeeMapper->mapDto($data);
                     $this->importEmployeeHandler->handleEmployeeData($dto);
-                    $this->workedOnRows[$data['email']] = true;
+                    $this->workedOnRows[$data['Email']] = true;
                 } catch (\Throwable $e) {
                     $this->importErrorLogger->log(
                         sprintf("Error while processing file with ID %s: row %s: %s Row content: %s",
