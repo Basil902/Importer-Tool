@@ -34,7 +34,7 @@ final class EmployeeDtoTest extends TestCase
         $this->assertContains($value, $expectedValues);
     }
 
-    public static function invalidInputProvider(): array
+    public static function invalidBoolProvider(): array
     {
         return [
             'empty string' => [''],
@@ -47,8 +47,8 @@ final class EmployeeDtoTest extends TestCase
         ];
     }
 
-    #[DataProvider('invalidInputProvider')]
-    public function testThrowsIfInvalidInput(mixed $input): void
+    #[DataProvider('invalidBoolProvider')]
+    public function testThrowsIfInvalidBool(mixed $input): void
     {
         $this->expectException(InvalidArgumentException::class);
 
