@@ -20,7 +20,9 @@ final class JSONImportReader implements ReaderInterface
         $fileName = basename($file);
 
         try {
-            if (null === Items::fromFile($file, ['decoder' => new ExtJsonDecoder(true)])) {
+            $rows = Items::fromFile($file, ['decoder' => new ExtJsonDecoder(true)]);
+
+            if (false === $this->containsElements($rows)) {
                 throw new UnreadeableFileException("JSON file '{$fileName}' is empty or malformed.");
             }
 
@@ -28,8 +30,19 @@ final class JSONImportReader implements ReaderInterface
 
                 yield $key => $value;
             }
+
         } catch (SyntaxErrorException $e) {
             throw new UnreadeableFileException("JSON file '{$fileName}' is empty or malformed.");
         }
+    }
+
+    private function containsElements(Items $rows): bool
+    {
+        // returns true if the iterable contains at least one row
+        foreach ($rows as $el) {
+            return true;
+        }
+
+        return false;
     }
 }
