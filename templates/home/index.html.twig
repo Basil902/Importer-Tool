@@ -16,8 +16,12 @@
     <div>
         {% for label, messages in app.flashes(['success']) %}
             {% for message in messages %}
-                <div class="alert alert-{{ label }}" style="width=32%;">
+                <div class="alert alert-{{ label }} alertMsg"
+                style="display:flex;width:50%;align-items:center;justify-content:space-between;border:1px solid #00ff66;border-radius:5px;background-color: #242829;padding:5px">
                     {{ message }}
+                    <button class="flashMessageBtn" style="color:lightgray;background-color:transparent;border:none;cursor:pointer">
+                        x
+                    </button>
                 </div>
             {% endfor %}
         {% endfor %}

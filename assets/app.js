@@ -8,3 +8,13 @@ import './stimulus_bootstrap.js';
 import './styles/app.css';
 
 console.log('This log comes from assets/app.js - welcome to AssetMapper! 🎉');
+
+document.addEventListener("click", (event) => {
+    const flashMessageBtn = event.target.closest(".flashMessageBtn");
+
+    if (!flashMessageBtn) {
+        return;
+    }
+
+    flashMessageBtn.parentElement.style.display = "none";
+});
