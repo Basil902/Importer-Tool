@@ -63,6 +63,7 @@ final class ImporterService
         $filePath = $this->importFileLocator->getFileToImport($file);
         $importReader = $this->readerFor($fileType);
         $fileId = $file->id;
+        $importFile = $this->em->getReference(ImportFile::class, $fileId);
         # disable profiler to reduce memory usage
         $this->disableProfiler();
         $this->updateImportFileStatus($fileId, ImportStatusEnum::STATUS_PROCESSING);
@@ -84,7 +85,7 @@ final class ImporterService
 
                 # the inner try/catch is for logging purposes, in case some rows are malformed. It also doesnt stop the import flow.
                 try {
-                    $dto = $this->employeeMapper->mapDto($data);
+                    $dto = $this->employeeMapper->mapDto($data, $importFile);
                     $this->importEmployeeHandler->handleEmployeeData($dto);
                     $this->workedOnRows[$data['Email']] = true;
                 } catch (\Throwable $e) {

@@ -25,6 +25,15 @@ class EmployeeRepository extends ServiceEntityRepository
             ->getOneOrNullResult();
     }
 
+    public function findAllByImportFile(int $fileId): array
+    {
+        return $this->createQueryBuilder('e')
+            ->andWhere('e.import_file_id = :var')
+            ->setParameter('var', $fileId)
+            ->getQuery()
+            ->getArrayResult();
+    }
+
     //    /**
     //     * @return Employee[] Returns an array of Employee objects
     //     */

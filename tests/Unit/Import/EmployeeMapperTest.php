@@ -2,11 +2,31 @@
 
 namespace App\Tests\Unit\Import;
 
+use App\Entity\ImportFile;
+use App\Entity\User;
+use App\Enum\FileTypeEnum;
 use App\Import\EmployeeMapper;
+use App\Tests\Factory\ImportFileFactory;
 use PHPUnit\Framework\TestCase;
 
 final class EmployeeMapperTest extends TestCase
 {
+    private ImportFile $importFile;
+
+    public function setUp(): void
+    {
+        $importFileFactory = new ImportFileFactory();
+        $user =  $this->createStub(User::class);
+
+        $importFile = $importFileFactory->create("test.csv", FileTypeEnum::CSV);
+
+        $importFile->setOwner($user);
+
+        $this->importFile = $importFile;
+
+        parent::setUp();
+    }
+
     public function testMapsRowToDto(): void
     {
         $mapper = new EmployeeMapper();
@@ -16,7 +36,9 @@ final class EmployeeMapperTest extends TestCase
             'Email' => 'mmustermann@webmail.com',
             'Role' => 'Senior Dev',
             'isActive' => 'yes',
-        ]);
+            ],
+            $this->importFile
+        );
 
         $this->assertSame('Max Mustermann', $employeeDTO->name);
         $this->assertSame('mmustermann@webmail.com', $employeeDTO->email);
@@ -34,7 +56,9 @@ final class EmployeeMapperTest extends TestCase
             'Name' => 'Max Mustermann',
             'Role' => 'Senior Dev',
             'isActive' => 'yes',
-        ]);
+            ],
+            $this->importFile
+        );
     }
 
     public function testThrowsWhenEmailIsInvalid(): void
@@ -48,7 +72,9 @@ final class EmployeeMapperTest extends TestCase
             'Email' => 'invalid email format',
             'Role' => 'Senior Dev',
             'isActive' => 'yes',
-        ]);
+            ],
+            $this->importFile
+        );
     }
 
     public function testThrowsWhenIsActiveKeyIsUnrecognizeable(): void
@@ -62,6 +88,8 @@ final class EmployeeMapperTest extends TestCase
             'Email' => 'mmustermann@webmail.com',
             'Role' => 'Senior Dev',
             'isActive' => 'qjknwf',
-        ]);
+            ],
+            $this->importFile
+        );
     }
 }
