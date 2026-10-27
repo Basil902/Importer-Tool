@@ -24,6 +24,7 @@ final class ImportEmployeeHandler implements ImportEmployeeHandlerInterface
         $employee->email = $employeeDTO->email;
         $employee->role = $employeeDTO->role;
         $employee->isActive = $employeeDTO->isActive;
+        $employee->importFile = $employeeDTO->importFile;
 
         $this->em->persist($employee);
 

@@ -2,12 +2,15 @@
 
 namespace App\DTO;
 
+use App\Entity\ImportFile;
+
 final class EmployeeDTO
 {
     public string $name;
     public string $email;
     public string $role;
     public bool $isActive;
+    public ImportFile $importFile;
 
     public static function create(): self
     {

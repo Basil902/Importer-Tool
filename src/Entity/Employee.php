@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use App\Repository\EmployeeRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\JoinColumn;
+use Doctrine\ORM\Mapping\ManyToOne;
 
 #[ORM\Entity(repositoryClass: EmployeeRepository::class)]
 #[ORM\Table(name: '`employee`')]
@@ -25,6 +27,10 @@ class Employee
 
     #[ORM\Column]
     public bool $isActive;
+
+    #[ManyToOne(targetEntity: ImportFile::class)]
+    #[JoinColumn(nullable: false)]
+    public ImportFile $importFile;
 
     public function getId(): ?int
     {

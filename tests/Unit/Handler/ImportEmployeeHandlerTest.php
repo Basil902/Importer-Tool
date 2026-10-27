@@ -4,13 +4,32 @@ namespace App\Tests\Unit\Handler;
 
 use App\DTO\EmployeeDTO;
 use App\Entity\Employee;
+use App\Entity\ImportFile;
+use App\Entity\User;
+use App\Enum\FileTypeEnum;
 use App\Handler\ImportEmployeeHandler;
 use App\Service\BatchService;
+use App\Tests\Factory\ImportFileFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 
 final class ImportEmployeeHandlerTest extends TestCase
 {
+    private ImportFile $importFile;
+
+    public function setUp(): void
+    {
+        $importFileFactory = new ImportFileFactory();
+        $user = $this->createStub(User::class);
+
+        $importFile = $importFileFactory->create("test.csv", FileTypeEnum::CSV);
+        $importFile->setOwner($user);
+
+        $this->importFile = $importFile;
+        
+        parent::setUp();
+    }
+
     public function testPersistsEmployeeFromDto(): void
     {
         $dto = new EmployeeDTO();
@@ -19,6 +38,7 @@ final class ImportEmployeeHandlerTest extends TestCase
         $dto->email = 'mmustermann@webmail.com';
         $dto->role = 'Senior Dev';
         $dto->isActive = 'yes';
+        $dto->importFile = $this->importFile;
 
         $em = $this->createMock(EntityManagerInterface::class);
         $em
@@ -47,6 +67,7 @@ final class ImportEmployeeHandlerTest extends TestCase
         $dto->email = 'mmustermann@webmail.com';
         $dto->role = 'Senior Dev';
         $dto->isActive = 'yes';
+        $dto->importFile = $this->importFile;
 
         $em = $this->createStub(EntityManagerInterface::class);
 
@@ -59,7 +80,7 @@ final class ImportEmployeeHandlerTest extends TestCase
         $handler->handleEmployeeData($dto);
     }
 
-    private static function makeDto(string $name, string $email, string $role): EmployeeDTO
+    private function makeDto(string $name, string $email, string $role): EmployeeDTO
     {
         $dto = EmployeeDTO::create();
 
@@ -67,11 +88,12 @@ final class ImportEmployeeHandlerTest extends TestCase
         $dto->email = $email;
         $dto->role = $role;
         $dto->isActive = 'yes';
+        $dto->importFile = $this->importFile;
 
         return $dto;
     }
 
-    public static function employeesToProcess(): array
+    public function employeesToProcess(): array
     {
         return [
             self::makeDto('Max Mustermann', 'mmustermann@webmail.com', 'Senior Dev'),
