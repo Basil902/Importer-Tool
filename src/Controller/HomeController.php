@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Employee;
 use App\Entity\ImportFile;
 use App\Enum\FileTypeEnum;
 use App\Form\UploadFileFormType;
@@ -82,7 +83,7 @@ final class HomeController extends AbstractController
     #[Route('/logs/{fileId}', name: 'app_view_file_logs')]
     public function logs(Request $request, int $fileId): Response
     {
-        $file = $this->em->getRepository(ImportFile::class)->find($fileId);
+        $file = $this->importFileRepository->find($fileId);
 
         if ($file && $file->getOwner() !== $this->getUser()) {
             throw $this->createAccessDeniedException('You do not have permission to view this file.');
@@ -118,6 +119,22 @@ final class HomeController extends AbstractController
             throw new \RuntimeException("Error during import process: {$e->getMessage()}");
         }
 
+    }
+
+    #[Route('/view-data/{fileId}', name: 'app_view_imported_data')]
+    public function viewImportedData(int $fileId, Request $request): Response
+    {
+        $records = $this->em->getRepository(Employee::class)->findAllByImportFile($fileId);
+        $fileName = $this->importFileRepository->find($fileId)->fileName;
+
+        if ([] !== $records) {
+            return $this->render('home/data.html.twig', [
+                'records' => $records,
+                'fileName' => $fileName,
+            ]);
+        }
+
+        throw new \RuntimeException("No records found for file {$fileId}");
     }
 
     #[Route('/delete-import/{fileId}', name: 'app_delete_file')]

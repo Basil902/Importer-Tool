@@ -19,3 +19,13 @@ body {
 .import-error {
     color: red
 }
+
+.dataTable {
+  border-collapse: collapse;
+  border: 1px solid white;
+}
+
+td, th {
+    border: 1px solid gray;
+    padding: 5px;
+}

@@ -1,5 +1,5 @@
 const eventSource = new EventSource('/live-progress');
-const disabledStatuses = ['processing', 'processed', 'error'];
+const disabledStatuses = ['processing', 'error'];
 
 // listen to all events (without a specific type)
 eventSource.onmessage = (event) => {
@@ -10,21 +10,32 @@ eventSource.onmessage = (event) => {
 
         if (!el) continue;
 
-        for (const node of el.childNodes) {
+        for (const child of el.children) {
 
             let shouldDisable = disabledStatuses.includes(status);
             const viewLogsBtn = el.querySelector('.viewLogsBtn');
+            const viewDataBtn = el.querySelector('.viewImportedDataBtn')
 
-            if ('P' === node.tagName ) {
-                node.className = `import-${status}`
-                node.innerHTML = status;
+            if ('P' === child.tagName ) {
+                child.className = `import-${status}`
+                child.innerHTML = status;
             } 
-            // Check if import button element is the first child of its type, to avoid disabling the delete button
-            else if ('BUTTON' === node.tagName && node.matches(':first-of-type')) {
-                shouldDisable ? node.setAttribute('disabled', '') : '';
 
-                if (node.hasAttribute('disabled')) {
-                    node.style.cursor = 'not-allowed';
+            if ('processed' === status) {
+                if (child.className === 'importBtn') {
+                    child.setAttribute('disabled', '');
+                    child.setAttribute('hidden', '');
+                } else {
+                    viewDataBtn.removeAttribute('disabled');
+                    viewDataBtn.removeAttribute('hidden');
+                }
+            }
+
+            else if ('importBtn' === child.className) {
+                shouldDisable ? child.setAttribute('disabled', '') : '';
+
+                if (child.hasAttribute('disabled')) {
+                    child.style.cursor = 'not-allowed';
                 }
             }
 

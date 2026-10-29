@@ -60,13 +60,16 @@
                             <p class="{{ "import-" ~ file.status.value }} importStatus">
                                 {{ file.status.value }}
                             </p>
-
-                            <button type="submit" style="cursor:pointer;">
+                            
+                            <button class="importBtn" type="submit">
                                 Import
                             </button>
 
-                            <button class="viewLogsBtn" type="submit" form="view-logs-{{ file.id }}"
-                            style="cursor:pointer" hidden disabled>
+                            <button class="viewImportedDataBtn" type="submit" form="view-imported-data-{{ file.id }}" hidden disabled>
+                                View imported data
+                            </button>
+
+                            <button class="viewLogsBtn" type="submit" form="view-logs-{{ file.id }}" hidden disabled>
                                 View logs
                             </button>                  
 
@@ -75,6 +78,10 @@
                             X
                         </button>
                         </div>
+                    </form>
+
+                    <form id="view-imported-data-{{ file.id }}" action="{{ path('app_view_imported_data', { 'fileId': file.id }) }}" method="GET">
+                        <input type="hidden" value={{ file.id }}>
                     </form>
 
                     <form id="view-logs-{{ file.id }}" action="{{ path('app_view_file_logs', { 'fileId': file.id }) }}" method="GET">
