@@ -28,10 +28,10 @@ class EmployeeRepository extends ServiceEntityRepository
     public function findAllByImportFile(int $fileId): array
     {
         return $this->createQueryBuilder('e')
-            ->andWhere('e.import_file_id = :var')
+            ->andWhere('e.importFile = :var')
             ->setParameter('var', $fileId)
             ->getQuery()
-            ->getArrayResult();
+            ->getResult();
     }
 
     //    /**
