@@ -124,13 +124,18 @@ final class HomeController extends AbstractController
     #[Route('/view-data/{fileId}', name: 'app_view_imported_data')]
     public function viewImportedData(int $fileId, Request $request): Response
     {
+        $file = $this->importFileRepository->find($fileId);
+
+        if ($file && $file->getOwner() !== $this->getUser()) {
+            throw $this->createAccessDeniedException("You do not have permissions to view this data.");
+        }
+
         $records = $this->em->getRepository(Employee::class)->findAllByImportFile($fileId);
-        $fileName = $this->importFileRepository->find($fileId)->fileName;
 
         if ([] !== $records) {
             return $this->render('home/data.html.twig', [
                 'records' => $records,
-                'fileName' => $fileName,
+                'fileName' => $file->fileName,
             ]);
         }
 
